@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "DSE_REST_WebApi": {
+    "WSE_REST_WebApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

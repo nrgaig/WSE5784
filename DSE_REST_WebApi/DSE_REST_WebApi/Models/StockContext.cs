@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DSE_REST_WebApi.Models
+namespace WSE_REST_WebApi.Models
 {
     public class StockContext:DbContext
     {

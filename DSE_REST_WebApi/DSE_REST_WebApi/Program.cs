@@ -1,7 +1,7 @@
-using DSE_REST_WebApi.Models;
+using WSE_REST_WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DSE_REST_WebApi
+namespace WSE_REST_WebApi
 {
     public class Program
     {

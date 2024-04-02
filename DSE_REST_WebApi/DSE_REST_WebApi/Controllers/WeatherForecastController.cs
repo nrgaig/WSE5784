@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace DSE_REST_WebApi.Controllers
+namespace WSE_REST_WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
