@@ -12,11 +12,12 @@ from datetime import datetime
 import pytz
 
 class StockInfoWindow(QMainWindow):
-    def _init_(self, stock_name, parent=None):
-        super()._init_(parent)
+    def __init__ (self, stock_name, parent=None):
+        super().__init__(parent)
         self.setWindowTitle(f"Stock Information - {stock_name}")
         self.setGeometry(100, 100, 400, 300)
         self.layout = QVBoxLayout()
+        
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
@@ -32,24 +33,28 @@ class StockInfoWindow(QMainWindow):
         self.layout.addWidget(self.close_button)
 
 class StockViewer(QMainWindow):
-    def _init_(self):
-        super()._init_()
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("Stock Viewer")
         self.setGeometry(100, 100, 600, 400)
-        self.layout = QVBoxLayout()
+
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        self.central_widget.setLayout(self.layout)
+        # self.central_widget.setLayout(self.layout)
 
+        self.layout = QVBoxLayout(self.central_widget)  # Set layout for central widget
+
+        # Clock label
         self.clock_label = QLabel()
         self.layout.addWidget(self.clock_label)
 
+        # Stock label
         self.stock_label = QLabel("Stocks:")
         self.layout.addWidget(self.stock_label)
 
         self.stock_list = QListWidget()
-        self.stock_list.addItems(["Apple", "Alphabet", "Meta", "Tesla"])
-        self.stock_list.itemClicked.connect(self.show_stock_info)
+        # self.stock_list.addItems(["Apple", "Alphabet", "Meta", "Tesla"])
+        # self.stock_list.itemClicked.connect(self.show_stock_info)
         self.layout.addWidget(self.stock_list)
 
         self.update_clock()
@@ -69,6 +74,11 @@ class StockViewer(QMainWindow):
             status = "Closed"
 
         self.clock_label.setText(f"New York Time: {ny_time} | Status: {status}")
+    
+    def list_stocks(self, stocks):
+     self.stock_list.clear()  # Assuming stock_list is a QListWidget
+     for stock in stocks:
+        self.stock_list.addItem(f"{stock.symbol}: {stock.company_name} at ${stock.current_price}")
 
     def show_stock_info(self, item):
         stock_name = item.text()
