@@ -1,4 +1,4 @@
-namespace DSE_REST_WebApi
+namespace WSE_REST_WebApi
 {
     public class WeatherForecast
     {
