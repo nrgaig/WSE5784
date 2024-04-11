@@ -13,92 +13,94 @@
   <property name="windowTitle">
    <string>Share Portfolio Manager</string>
   </property>
-  
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="mainLayout">
     <item>
+     <widget class="QScrollBar" name="verticalScrollBar">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QFrame" name="listFrame">
       <layout class="QVBoxLayout" name="listLayout">
-        <item>
-          <widget class="QListView" name="vivoList">
-            <property name="toolTip">
-              <string>Vivo Stock List</string>
-            </property>
-          </widget>
-        </item>
+       <item>
+        <widget class="QListView" name="vivoList">
+         <property name="toolTip">
+          <string>Vivo Stock List</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
-    
     <item>
      <widget class="QFrame" name="infoFrame">
       <layout class="QVBoxLayout" name="infoLayout">
-        <item>
-          <widget class="QToolBar" name="toolBar">
-            <addaction name="actionAdd"/>
-            <addaction name="actionDelete"/>
-            <addaction name="actionRefresh"/>
-          </widget>
-        </item>
-        
-        <item>
-          <widget class="QListView" name="portfolioList">
-            <property name="toolTip">
-              <string>Portfolio</string>
-            </property>
-          </widget>
-        </item>
-        
-        <item>
-          <widget class="QLCDNumber" name="clockDisplay">
-            <property name="segmentStyle">
-              <enum>Flat</enum>
-            </property>
-          </widget>
-        </item>
+       <item>
+        <widget class="QToolBar" name="toolBar">
+         <addaction name="actionAdd"/>
+         <addaction name="actionDelete"/>
+         <addaction name="actionRefresh"/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListView" name="portfolioList">
+         <property name="toolTip">
+          <string>Portfolio</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+       </item>
       </layout>
      </widget>
     </item>
    </layout>
   </widget>
-  
-  <widget class="QMenuBar" name="menuBar"/>
-  <widget class="QStatusBar" name="statusBar"/>
-  
-  <action name="actionAdd">
-   <property name="text">
-    <string>Add Stock</string>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>986</width>
+     <height>22</height>
+    </rect>
    </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAdd">
    <property name="icon">
     <iconset>
      <normaloff>../icons/add.png</normaloff>../icons/add.png</iconset>
    </property>
-  </action>
-  
-  <action name="actionDelete">
    <property name="text">
-    <string>Delete Stock</string>
+    <string>Add Stock</string>
    </property>
+  </action>
+  <action name="actionDelete">
    <property name="icon">
     <iconset>
      <normaloff>../icons/delete.png</normaloff>../icons/delete.png</iconset>
    </property>
-  </action>
-  
-  <action name="actionRefresh">
    <property name="text">
-    <string>Refresh List</string>
+    <string>Delete Stock</string>
    </property>
+  </action>
+  <action name="actionRefresh">
    <property name="icon">
     <iconset>
      <normaloff>../icons/refresh.png</normaloff>../icons/refresh.png</iconset>
    </property>
+   <property name="text">
+    <string>Refresh List</string>
+   </property>
   </action>
  </widget>
- 
  <resources>
   <include location="../icons.qrc"/>
  </resources>
- 
  <connections/>
 </ui>
