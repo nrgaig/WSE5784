@@ -1,10 +1,11 @@
 import sys
+
 from PySide6.QtWidgets import QApplication  # Ensure this is imported
-from frontHand.presenter import Presenter
+from frontHand import presenter
 
 def main():
     app = QApplication(sys.argv)  # Create QApplication instance first
-    presenter = Presenter()
+    presenter = presenter.Presenter()
     presenter.add_stock_to_list("Tech Corp", "TC", 100.0)
     presenter.list_stocks()
     presenter.update_stock_price(symbol="TC", new_price=105.0)

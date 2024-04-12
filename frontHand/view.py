@@ -1,4 +1,6 @@
 import sys
+
+from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -12,6 +14,8 @@ from datetime import datetime
 import pytz
 
 class StockInfoWindow(QMainWindow):
+    closed = Signal()  # Signal emitted when the window is closed
+
     def __init__ (self, stock_name, parent=None):
         super().__init__(parent)
         self.setWindowTitle(f"Stock Information - {stock_name}")
@@ -29,7 +33,7 @@ class StockInfoWindow(QMainWindow):
         self.layout.addWidget(self.company_label)
 
         self.close_button = QPushButton("Close")
-        self.close_button.clicked.connect(self.close)
+        self.close_button.clicked.connect(self.close_window)
         self.layout.addWidget(self.close_button)
 
 class StockViewer(QMainWindow):
@@ -40,7 +44,6 @@ class StockViewer(QMainWindow):
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        # self.central_widget.setLayout(self.layout)
 
         self.layout = QVBoxLayout(self.central_widget)  # Set layout for central widget
 
@@ -58,6 +61,9 @@ class StockViewer(QMainWindow):
         self.layout.addWidget(self.stock_list)
 
         self.update_clock()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_clock)
+        self.timer.start(1000)  # Update clock every second
 
     def update_clock(self):
         ny_timezone = pytz.timezone("America/New_York")
@@ -80,14 +86,21 @@ class StockViewer(QMainWindow):
      for stock in stocks:
         self.stock_list.addItem(f"{stock.symbol}: {stock.company_name} at ${stock.current_price}")
 
-    def show_stock_info(self, item):
-        stock_name = item.text()
+    def show_stock_info(self, stock):
+        # info_window = StockInfoWindow(stock)
+        # info_window.closed.connect(self.show)  # Re-show this window when the info window closes
+        # info_window.show()
+        # self.hide()
+        stock_name = stock.text()
         stock_info_window = StockInfoWindow(stock_name, parent=self)
         stock_info_window.show()
 
 
 
-
+    #@Slot()
+    def close_window(self):
+        self.close()
+        self.closed.emit() # Emit signal when the window is closed
 
 # class View:
     
