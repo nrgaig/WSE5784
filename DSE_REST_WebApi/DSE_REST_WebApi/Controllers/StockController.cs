@@ -32,15 +32,32 @@ namespace WSE_REST_WebApi.Controllers
             return await _dbContext.Stocks.ToListAsync();
         }
 
-        //GET: api/Stock/tiingo/5
-        [HttpGet("tiingo/{id}")]
-        public async Task<ActionResult<Stream>> GetStockId(string id)
+        //GET: api/Stock/tiingo/NVDA
+        [HttpGet("tiingo/{symbol}")]
+        public async Task<ActionResult<Stream>> TiingoGetStockIdAsync(string symbol)
         {
             try
             {
-                var stock = await TiingoService.GetStockId(id);
+                var stock = await TiingoService.GetStockId(symbol);
                 if (stock == null) { return NotFound(); }
                 return stock;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
+        }
+
+        //GET: api/Stock/polygon/prev/NVDA
+        [HttpGet("polygon/prev/{symbol}")]
+        public async Task<ActionResult<string>> GetStockPrevCloseAsync(string symbol)
+        {
+            try
+            {
+                var stock = await PolygonService.GetStockPrevCloseAsync(symbol);
+                if (stock == null) { return NotFound(); }
+                return stock.Value.ToJsonString();
             }
             catch (Exception ex)
             {
