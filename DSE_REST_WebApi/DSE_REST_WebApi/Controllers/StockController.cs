@@ -49,6 +49,23 @@ namespace WSE_REST_WebApi.Controllers
             }
         }
 
+        //GET: api/Stock/polygon/NVDA/graph/30
+        [HttpGet("polygon/{symbol}/graph/{from}")]
+        public async Task<ActionResult<Stream>> GetStockPrevCloseAsync(string symbol, int from)
+        {
+            try
+            {
+                var stock = await PolygonService.GetStockHistoryAsync(symbol,from);
+                if (stock == null) { return NotFound(); }
+                return stock;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
+        }
+
         //GET: api/Stock/polygon/prev/NVDA
         [HttpGet("polygon/prev/{symbol}")]
         public async Task<ActionResult<string>> GetStockPrevCloseAsync(string symbol)

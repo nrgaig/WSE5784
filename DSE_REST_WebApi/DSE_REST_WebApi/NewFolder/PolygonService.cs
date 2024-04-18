@@ -8,11 +8,14 @@ namespace WSE_REST_WebApi.NewFolder
     {
         private static readonly string APIKey = "inium9MbgdoGg2YQ23zMkvYggnTWT7DH";
         private static readonly string BaseUrl = "https://api.polygon.io/v2/aggs/";
-        public static async Task<ActionResult<Stream>> GetStockHistoryAsync(string symbol)
+        public static async Task<ActionResult<Stream>> GetStockHistoryAsync(string symbol,int timespan)
         {
+            if (timespan >= 730 || timespan < 0) { return new NotFoundResult(); }
+            DateTime history = DateTime.Today.AddDays(-timespan);
+
             using (HttpClient _httpClient = new HttpClient())
             {
-                var query = $"{BaseUrl}daily/{symbol}?token={APIKey}";
+                var query = $"{BaseUrl}ticker/{symbol}/range/1/day/{history.ToString("yyyy-MM-dd")}/{DateTime.Now.ToString("yyyy-MM-dd")}?adjusted=true&sort=asc&limit=730&apiKey={APIKey}";
                 var response = await _httpClient.GetAsync(query);
                 response.EnsureSuccessStatusCode();
                 var stock = await response.Content.ReadAsStreamAsync();
