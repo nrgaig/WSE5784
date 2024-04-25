@@ -1,6 +1,6 @@
 # from stock import Stock 
 # from view import View
-import frontHand.stock as stock
+from stock import add_stock, delete_stock, update_stock, get_all_stocks
 from view import StockViewer
 
 # from frontHand.stock import Stock
@@ -18,7 +18,7 @@ class Presenter:
         self.load_stocks()
 
     def load_stocks(self):
-        stocks = stock.get_all_stocks()
+        stocks = get_all_stocks()
         if stocks:
             self.view.list_stocks(stocks)
         else:
@@ -26,13 +26,8 @@ class Presenter:
 
     # adding a stock to the list of stocks   
     def add_stock_to_list(self,symbol, company_name, price):
-        try:
-            stock.add_stock(symbol, company_name, price)
-            self.load_stocks()
-            self.view.show_message("Stock added successfully")
-        except Exception as e:
-            self.view.show_message(f"Error adding stock: {e}")
-
+        stock = Stock(company_name=company_name, symbol=symbol, current_price=price)
+        self.stocks.append(stock)
 
     # listing all the stocks
     def list_stocks(self):
@@ -54,7 +49,7 @@ class Presenter:
     # deleting a stock according to the symbol 
     def delete_stock_by_symbol(self, symbol):
         try:
-            stock.delete_stock(symbol)
+            delete_stock(symbol)
             self.load_stocks()
             self.view.show_message("Stock deleted successfully")
         except Exception as e:
@@ -63,25 +58,32 @@ class Presenter:
     # deleting a stock according to the company name
     def delete_stock_by_company_name(self, company_name):
         try:
+            delete_stock(company_name)
+            self.load_stocks()
+            self.view.show_message("Stock deleted successfully")
+        except Exception as e:
+            self.view.show_message(f"Error deleting stock: {e}")
+
+        try:
             stock.delete_stock(company_name)
             self.load_stocks()
             self.view.show_message("Stock deleted successfully")
         except Exception as e:
             self.view.show_message(f"Error deleting stock: {e}")
-        
+
     def update_stock_price(self, symbol=None, company_name=None, new_price=None):
         try:
-            stock.update_stock(symbol, company_name, new_price)
+            update_stock(symbol, company_name, new_price)
             self.load_stocks()
             self.view.show_message("Stock updated successfully")
         except Exception as e:
             self.view.show_message(f"Error updating stock price: {e}")
-        
+
 
     #TODO check this method necessary
     def buy_stock(self, symbol, quantity):
         try:
-            #stock = 
+            #stock =
             self._buy_stock(symbol, quantity)
         except Exception as e:
             print(f"Error buying stock: {e}")

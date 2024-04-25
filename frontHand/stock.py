@@ -17,19 +17,3 @@ class Stock:
         pass
     def get_stock_by_company_name(company_name):
         pass
-
-
-def add_stock():
-    return None
-
-
-def delete_stock():
-    return None
-
-
-def update_stock():
-    return None
-
-
-def get_all_stocks():
-    return None

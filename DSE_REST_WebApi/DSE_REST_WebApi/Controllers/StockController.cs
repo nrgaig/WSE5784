@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient.DataClassification;
+using System.Net.Http;
+using WSE_REST_WebApi.NewFolder;
 
 namespace WSE_REST_WebApi.Controllers
 {
@@ -11,10 +13,15 @@ namespace WSE_REST_WebApi.Controllers
     public class StockController : ControllerBase
     {
         private readonly StockContext _dbContext;
+        private readonly HttpClient _httpClient;
+        private readonly string frosToken = "78e2a84e3c3fd84749a6d9b171689dc4a08e8f7b";
         public StockController(StockContext dbContext)
         {
             _dbContext = dbContext;
+            _httpClient = new HttpClient();
         }
+        private readonly StockContext API_dbContext;
+
 
         //GET: api/Stocks
         [HttpGet]
@@ -23,6 +30,57 @@ namespace WSE_REST_WebApi.Controllers
             if (_dbContext.Stocks == null) { return NotFound(); }
 
             return await _dbContext.Stocks.ToListAsync();
+        }
+
+        //GET: api/Stock/tiingo/NVDA
+        [HttpGet("tiingo/{symbol}")]
+        public async Task<ActionResult<Stream>> TiingoGetStockIdAsync(string symbol)
+        {
+            try
+            {
+                var stock = await TiingoService.GetStockId(symbol);
+                if (stock == null) { return NotFound(); }
+                return stock;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
+        }
+
+        //GET: api/Stock/polygon/NVDA/graph/30
+        [HttpGet("polygon/{symbol}/graph/{from}")]
+        public async Task<ActionResult<Stream>> GetStockPrevCloseAsync(string symbol, int from)
+        {
+            try
+            {
+                var stock = await PolygonService.GetStockHistoryAsync(symbol,from);
+                if (stock == null) { return NotFound(); }
+                return stock;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
+        }
+
+        //GET: api/Stock/polygon/prev/NVDA
+        [HttpGet("polygon/prev/{symbol}")]
+        public async Task<ActionResult<string>> GetStockPrevCloseAsync(string symbol)
+        {
+            try
+            {
+                var stock = await PolygonService.GetStockPrevCloseAsync(symbol);
+                if (stock == null) { return NotFound(); }
+                return stock.Value.ToJsonString();
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
         }
 
         //GET: api/Stock/5
