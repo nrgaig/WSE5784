@@ -49,6 +49,23 @@ namespace WSE_REST_WebApi.Controllers
             }
         }
 
+        //GET: api/Stock/tiingo/NVDA/graph/30
+        [HttpGet("tiingo/{symbol}/graph/{from}")]
+        public async Task<ActionResult<Stream>> TiingoGetStockPriceAsync(string symbol,int from)
+        {
+            try
+            {
+                var stock = await TiingoService.GetStockIdPrice(symbol,from);
+                if (stock == null) { return NotFound(); }
+                return stock;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return NotFound();
+            }
+        }
+
         //GET: api/Stock/polygon/NVDA/graph/30
         [HttpGet("polygon/{symbol}/graph/{from}")]
         public async Task<ActionResult<Stream>> GetStockPrevCloseAsync(string symbol, int from)
@@ -100,7 +117,7 @@ namespace WSE_REST_WebApi.Controllers
         {
             if (_dbContext.Stocks == null) { return NotFound(); }
 
-            var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Name == input||s.Symbol==input);
+            var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Name == input||s.Ticker==input);
             if (stock == null) { return NotFound(); }
             return stock;
         }
@@ -112,7 +129,7 @@ namespace WSE_REST_WebApi.Controllers
             if (_dbContext.Stocks == null) { return NotFound(); }
 
             var stocks = await _dbContext.Stocks
-                .Where(s => s.Name.Contains(query) || s.Symbol.Contains(query))
+                .Where(s => s.Name.Contains(query) || s.Ticker.Contains(query))
                 .ToListAsync();
 
             if (!stocks.Any()) { return NotFound(); }
@@ -120,35 +137,35 @@ namespace WSE_REST_WebApi.Controllers
             return stocks;
         }
 
-        // GET: /api/Stock/AboveValue/{value}
-        [HttpGet("AboveValue/{value}")]
-        public async Task<ActionResult<IEnumerable<Stock>>> GetStocksAboveValue(double value)
-        {
-            if (_dbContext.Stocks == null) { return NotFound(); }
+        //// GET: /api/Stock/AboveValue/{value}
+        //[HttpGet("AboveValue/{value}")]
+        //public async Task<ActionResult<IEnumerable<Stock>>> GetStocksAboveValue(double value)
+        //{
+        //    if (_dbContext.Stocks == null) { return NotFound(); }
 
-            var stocks = await _dbContext.Stocks
-                .Where(s => s.Value > value)
-                .ToListAsync();
+        //    var stocks = await _dbContext.Stocks
+        //        .Where(s => s.Value > value)
+        //        .ToListAsync();
 
-            if (!stocks.Any()) { return NotFound(); }
+        //    if (!stocks.Any()) { return NotFound(); }
 
-            return stocks;
-        }
+        //    return stocks;
+        //}
 
-        // GET: /api/Stock/BelowValue/{value}
-        [HttpGet("BelowValue/{value}")]
-        public async Task<ActionResult<IEnumerable<Stock>>> GetStocksBelowValue(double value)
-        {
-            if (_dbContext.Stocks == null) { return NotFound(); }
+        //// GET: /api/Stock/BelowValue/{value}
+        //[HttpGet("BelowValue/{value}")]
+        //public async Task<ActionResult<IEnumerable<Stock>>> GetStocksBelowValue(double value)
+        //{
+        //    if (_dbContext.Stocks == null) { return NotFound(); }
 
-            var stocks = await _dbContext.Stocks
-                .Where(s => s.Value < value)
-                .ToListAsync();
+        //    var stocks = await _dbContext.Stocks
+        //        .Where(s => s.Value < value)
+        //        .ToListAsync();
 
-            if (!stocks.Any()) { return NotFound(); }
+        //    if (!stocks.Any()) { return NotFound(); }
 
-            return stocks;
-        }
+        //    return stocks;
+        //}
         //POST: api/Stocks
         [HttpPost]
         public async Task<ActionResult<Stock>> PostStock(Stock stock)

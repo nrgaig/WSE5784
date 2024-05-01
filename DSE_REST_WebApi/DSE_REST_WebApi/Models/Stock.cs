@@ -2,10 +2,16 @@
 {
     public class Stock
     {
-        public double Value { get; set; }
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Symbol { get; set; }
 
+        public string Name { get; set; }
+
+        public string Ticker { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? EconomicDescription { get; set; }
     }
+
 }
+
