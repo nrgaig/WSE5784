@@ -4,7 +4,7 @@
 
 namespace WSE_REST_WebApi.Migrations
 {
-    public partial class Initial1 : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

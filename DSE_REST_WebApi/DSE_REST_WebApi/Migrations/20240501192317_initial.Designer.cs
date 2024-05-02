@@ -11,8 +11,8 @@ using WSE_REST_WebApi.Models;
 namespace WSE_REST_WebApi.Migrations
 {
     [DbContext(typeof(StockContext))]
-    [Migration("20240501182952_Initial")]
-    partial class Initial
+    [Migration("20240501192317_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
