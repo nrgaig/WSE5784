@@ -4,12 +4,12 @@
     {
 
         public string? date { get; set; }
-        public string? close { get; set; }
-        public string? high { get; set; }
-        public string? low { get; set; }
-        public string? open { get; set; }
-        public string? volume { get; set; }
-        public string? divCash { get; set; }
-        public string? splitFactor { get; set; }
+        public double? close { get; set; }
+        public double? high { get; set; }
+        public double? low { get; set; }
+        public double? open { get; set; }
+        public double? volume { get; set; }
+        public double? divCash { get; set; }
+        public double? splitFactor { get; set; }
     }
 }

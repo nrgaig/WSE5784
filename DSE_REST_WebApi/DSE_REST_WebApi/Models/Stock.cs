@@ -1,4 +1,6 @@
-﻿namespace WSE_REST_WebApi.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WSE_REST_WebApi.Models
 {
     public class Stock
     {
@@ -10,6 +12,7 @@
 
         public string? Description { get; set; }
 
+        [NotMapped]
         public List<TiingoPriceDto>? EconomicDescription { get; set; }
     }
 

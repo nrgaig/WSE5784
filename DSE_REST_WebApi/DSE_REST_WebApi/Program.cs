@@ -25,6 +25,7 @@ namespace WSE_REST_WebApi
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                //app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             }
 
             app.UseAuthorization();

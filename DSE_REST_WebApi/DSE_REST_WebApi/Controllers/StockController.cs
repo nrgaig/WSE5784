@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient.DataClassification;
 using System.Net.Http;
 using WSE_REST_WebApi.NewFolder;
+using Microsoft.CodeAnalysis;
+using WSE_REST_WebApi.Convertor;
 
 namespace WSE_REST_WebApi.Controllers
 {
@@ -34,33 +36,44 @@ namespace WSE_REST_WebApi.Controllers
 
         //GET: api/Stock/tiingo/NVDA
         [HttpGet("tiingo/{symbol}")]
-        public async Task<ActionResult<Stream>> TiingoGetStockIdAsync(string symbol)
+        public async Task<ActionResult<Stock?>> TiingoGetStockIdAsync(string symbol)
         {
             try
             {
                 var stock = await TiingoService.GetStockId(symbol);
-                if (stock == null) { return NotFound(); }
-                return stock;
+                if (stock == null) {
+                    Console.WriteLine("1");
+                    return NotFound(); 
+                }
+
+                return await stockFromJsons(symbol, 1);
             }
             catch (Exception ex)
             {
                 // Handle exceptions
+                Console.WriteLine("2");
+
                 return NotFound();
             }
         }
 
         //GET: api/Stock/tiingo/NVDA/graph/30
         [HttpGet("tiingo/{symbol}/graph/{from}")]
-        public async Task<ActionResult<Stream>> TiingoGetStockPriceAsync(string symbol,int from)
+        public async Task<ActionResult<Stock?>> TiingoGetStockPriceAsync(string symbol, int from)
         {
             try
             {
-                var stock = await TiingoService.GetStockIdPrice(symbol,from);
-                if (stock == null) { return NotFound(); }
-                return stock;
+                var stock = await TiingoService.GetStockIdPrice(symbol, from);
+                if (stock == null) {
+                    Console.WriteLine("3");
+
+                    return NotFound(); }
+                return await stockFromJsons(symbol, from);
             }
             catch (Exception ex)
             {
+                Console.WriteLine("4");
+
                 // Handle exceptions
                 return NotFound();
             }
@@ -74,7 +87,7 @@ namespace WSE_REST_WebApi.Controllers
             {
                 var stock = await PolygonService.GetStockHistoryAsync(symbol,from);
                 if (stock == null) { return NotFound(); }
-                return stock;
+                return Ok(stock);
             }
             catch (Exception ex)
             {
@@ -91,7 +104,8 @@ namespace WSE_REST_WebApi.Controllers
             {
                 var stock = await PolygonService.GetStockPrevCloseAsync(symbol);
                 if (stock == null) { return NotFound(); }
-                return stock.Value.ToJsonString();
+                return Ok(stock.Value.ToJsonString());
+                //return stock;
             }
             catch (Exception ex)
             {
@@ -108,7 +122,7 @@ namespace WSE_REST_WebApi.Controllers
 
             var stock = await _dbContext.Stocks.FindAsync(id);
             if (stock == null) { return NotFound(); }
-            return stock;
+            return Ok(stock);
         }
 
         //GET: /api/Stock/s/APPL
@@ -119,7 +133,7 @@ namespace WSE_REST_WebApi.Controllers
 
             var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Name == input||s.Ticker==input);
             if (stock == null) { return NotFound(); }
-            return stock;
+            return Ok(stock);
         }
 
         //GET: /api/Stock/q/APPL
@@ -134,7 +148,7 @@ namespace WSE_REST_WebApi.Controllers
 
             if (!stocks.Any()) { return NotFound(); }
 
-            return stocks;
+            return Ok(stocks);
         }
 
         //// GET: /api/Stock/AboveValue/{value}
@@ -166,14 +180,45 @@ namespace WSE_REST_WebApi.Controllers
 
         //    return stocks;
         //}
-        //POST: api/Stocks
-        [HttpPost]
-        public async Task<ActionResult<Stock>> PostStock(Stock stock)
+
+
+
+
+
+        // POST: api/Stocks/
+        [HttpPost("tiingoPost/{ticker}/db/{days}")]
+        public async Task<ActionResult<Stock>> PostStock(string ticker, int days)
         {
+            var existStock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Ticker == ticker);
+            if (existStock != null) { return Ok(existStock); }
+            //לבדוק אם זה באמת הערך שצריך להחזיר
+
+
+            var stock = new Stock();
+            var stockQ = await TiingoService.GetStockId(ticker);
+            if (stockQ == null) { return null; }
+            var con = new JsonConverotr();
+            stock = con.GetStockFromJson(stockQ);
+            var stockPrice = await TiingoService.GetStockIdPrice(ticker, days);
+            stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+
             _dbContext.Stocks.Add(stock);
             await _dbContext.SaveChangesAsync();
-            return CreatedAtAction(nameof(PostStock), new { id = stock.Id }, stock);
+            return stock;
+
         }
+
+
+
+
+        ////POST: 
+        //[HttpPost]
+        //public async Task<ActionResult<Stock>> PostStock(Stock stock)
+        //{
+        //    _dbContext.Stocks.Add(stock);
+        //    await _dbContext.SaveChangesAsync();
+        //    return Ok(CreatedAtAction(nameof(PostStock), new { id = stock.Id }, stock));
+        //}
 
         //PUT:
         [HttpPut("{id}")]
@@ -201,7 +246,7 @@ namespace WSE_REST_WebApi.Controllers
         }
         private bool StockExists(int id)
         {
-            return(_dbContext.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_dbContext.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
         //DELETE:
@@ -220,11 +265,26 @@ namespace WSE_REST_WebApi.Controllers
 
         }
 
-        //shtut
-        [HttpGet("search")]
-        public async Task<ActionResult<string>> Shtut(int x,int y)
+        ////shtut
+        //[HttpGet("search")]
+        //public async Task<ActionResult<string>> Shtut(int x,int y)
+        //{
+        //    return Ok($"shtut about {x} and {y}\n");
+        //}
+
+
+        //GET: api/Stock/tiingo/NVDA/many/30
+        [HttpGet("tiingo/{ticker}/many/{days}")]
+        public async Task<ActionResult<Stock?>> stockFromJsons(string ticker, int days)
         {
-            return Ok($"shtut about {x} and {y}\n");
+            var stock = new Stock();
+            var stockQ = await TiingoService.GetStockId(ticker);
+            if (stockQ == null) { return null; }
+            var con = new JsonConverotr();
+            stock = con.GetStockFromJson(stockQ);
+            var stockPrice = await TiingoService.GetStockIdPrice(ticker, days);
+            stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            return stock;
         }
     }
 }
