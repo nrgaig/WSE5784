@@ -284,6 +284,7 @@ namespace WSE_REST_WebApi.Controllers
             stock = con.GetStockFromJson(stockQ);
             var stockPrice = await TiingoService.GetStockIdPrice(ticker, days);
             stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            //stock.EconomicDescriptionJson = await TiingoService.GetStockIdPrice(ticker, days);
             return stock;
         }
     }

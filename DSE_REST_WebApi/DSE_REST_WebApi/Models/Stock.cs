@@ -14,6 +14,7 @@ namespace WSE_REST_WebApi.Models
 
         [NotMapped]
         public List<TiingoPriceDto>? EconomicDescription { get; set; }
+        //public string? EconomicDescriptionJson { get; set; }
     }
 
 }
