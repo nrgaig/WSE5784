@@ -6,11 +6,11 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>986</width>
+    <width>917</width>
     <height>768</height>
    </rect>
   </property>
-  <property name="windowTitle">
+  <property name="main_window" stdset="0">
    <string>Share Portfolio Manager</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -23,39 +23,69 @@
      </widget>
     </item>
     <item>
-     <widget class="QFrame" name="listFrame">
-      <layout class="QVBoxLayout" name="listLayout">
-       <item>
-        <widget class="QListView" name="vivoList">
-         <property name="toolTip">
-          <string>Vivo Stock List</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <widget class="QFrame" name="infoFrame">
-      <layout class="QVBoxLayout" name="infoLayout">
-       <item>
-        <widget class="QToolBar" name="toolBar">
-         <addaction name="actionAdd"/>
-         <addaction name="actionDelete"/>
-         <addaction name="actionRefresh"/>
-        </widget>
-       </item>
-       <item>
-        <widget class="QListView" name="portfolioList">
-         <property name="toolTip">
-          <string>Portfolio</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDateTimeEdit" name="dateTimeEdit"/>
-       </item>
-      </layout>
+      <widget class="QListView" name="portfolioList">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>431</width>
+         <height>301</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Portfolio</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="listFrame">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>0</y>
+         <width>435</width>
+         <height>707</height>
+        </rect>
+       </property>
+       <widget class="QListView" name="vivoList">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>421</width>
+          <height>671</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Vivo Stock List</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>411</width>
+          <height>21</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QListView" name="portfolioList_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>380</y>
+         <width>431</width>
+         <height>301</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Portfolio</string>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -65,10 +95,16 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>986</width>
+     <width>917</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>תיק המניות שלי</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">

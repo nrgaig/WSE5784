@@ -1,7 +1,9 @@
 # from stock import Stock 
 # from view import View
 from stock import add_stock, delete_stock, update_stock, get_all_stocks
-from view import StockViewer
+from MainWindow import QApplication, QMainWindow, QFrame, QHBoxLayout, QLineEdit, QListView, QMenu, QMenuBar, QScrollBar, QSizePolicy, QStatusBar, QWidget, QAction, QIcon, QSize, QRect, Qt
+import requests     # for making HTTP requests
+
 
 # from frontHand.stock import Stock
 # from frontHand.view import StockViewer
@@ -9,13 +11,21 @@ from view import StockViewer
 class Presenter:
 #
 # The Presenter class is responsible for handling the logic of the application.
+# It receives input from the user and sends it to the model for processing.
 #
+    api_url = "https://api.twelvedata.com/price?symbol="
 
     # initializing the view and the list of stocks
-    def __init__(self):
-        self.view = StockViewer()
+    def __init__(self,main_window):
+        self.main_window = main_window
       #  self.view.stock_list.itemClicked.connect(self.stock_clicked)
         self.load_stocks()
+        
+    def show_view1(self):
+        self.main_window.set_current_view(())
+
+    def show_view2(self):
+        self.main_window.set_current_view(View2())
 
     def load_stocks(self):
         stocks = get_all_stocks()
