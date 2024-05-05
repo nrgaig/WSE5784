@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\projectes\WSE5784\frontHand\stock_portfolio.ui'
+# Form implementation generated from reading ui file 'C:\projectes\WSE5784\frontEnd\stock_portfolio.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #

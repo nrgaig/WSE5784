@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>917</width>
+    <width>878</width>
     <height>768</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
     </item>
     <item>
      <widget class="QFrame" name="infoFrame">
-      <widget class="QListView" name="portfolioList">
+      <widget class="QListView" name="StockExtendedDisplay">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -46,7 +46,7 @@
          <height>707</height>
         </rect>
        </property>
-       <widget class="QListView" name="vivoList">
+       <widget class="QListView" name="StockDisplay">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -71,9 +71,12 @@
           <height>21</height>
          </rect>
         </property>
+        <property name="placeholderText">
+         <string>חפש כאן </string>
+        </property>
        </widget>
       </widget>
-      <widget class="QListView" name="portfolioList_2">
+      <widget class="QListView" name="StockGraph">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -95,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>917</width>
+     <width>878</width>
      <height>22</height>
     </rect>
    </property>
@@ -104,13 +107,19 @@
      <string>תיק המניות שלי</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>כל המניות</string>
+    </property>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/add.png</normaloff>../icons/add.png</iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/add.png</normaloff>../../../Users/ziv52/.designer/icons/add.png</iconset>
    </property>
    <property name="text">
     <string>Add Stock</string>
@@ -119,7 +128,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/delete.png</normaloff>../icons/delete.png</iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/delete.png</normaloff>../../../Users/ziv52/.designer/icons/delete.png</iconset>
    </property>
    <property name="text">
     <string>Delete Stock</string>
@@ -128,7 +137,7 @@
   <action name="actionRefresh">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/refresh.png</normaloff>../icons/refresh.png</iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/refresh.png</normaloff>../../../Users/ziv52/.designer/icons/refresh.png</iconset>
    </property>
    <property name="text">
     <string>Refresh List</string>

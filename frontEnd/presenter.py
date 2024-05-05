@@ -1,34 +1,28 @@
-# from stock import Stock 
-# from view import View
-from stock import add_stock, delete_stock, update_stock, get_all_stocks
-from MainWindow import QApplication, QMainWindow, QFrame, QHBoxLayout, QLineEdit, QListView, QMenu, QMenuBar, QScrollBar, QSizePolicy, QStatusBar, QWidget, QAction, QIcon, QSize, QRect, Qt
-import requests     # for making HTTP requests
 
+import MainWindow
 
-# from frontHand.stock import Stock
-# from frontHand.view import StockViewer
-
+from stock import Stock
 class Presenter:
 #
 # The Presenter class is responsible for handling the logic of the application.
 # It receives input from the user and sends it to the model for processing.
 #
-    api_url = "https://api.twelvedata.com/price?symbol="
 
     # initializing the view and the list of stocks
-    def __init__(self,main_window):
-        self.main_window = main_window
-      #  self.view.stock_list.itemClicked.connect(self.stock_clicked)
-        self.load_stocks()
+    def __init__(self,view, model):
+        self.view = view
+        self.model = model
+
+
         
-    def show_view1(self):
-        self.main_window.set_current_view(())
+    def show_MainWindow(self):
+        self.main_window.set_current_view(MainWindow())
 
     def show_view2(self):
         self.main_window.set_current_view(View2())
 
     def load_stocks(self):
-        stocks = get_all_stocks()
+        stocks = self.model.get_all_stocks()
         if stocks:
             self.view.list_stocks(stocks)
         else:
@@ -90,19 +84,3 @@ class Presenter:
             self.view.show_message(f"Error updating stock price: {e}")
 
 
-    #TODO check this method necessary
-    def buy_stock(self, symbol, quantity):
-        try:
-            #stock =
-            self._buy_stock(symbol, quantity)
-        except Exception as e:
-            print(f"Error buying stock: {e}")
-
-        # for stock in self.stocks:
-        #     if stock.symbol == symbol:
-        #         stock.buy(quantity)
-        #         print(f"Bought {quantity} shares of {stock.symbol}")
-        #         return
-        # print(f"Stock with symbol {symbol} not found")
-
-        
