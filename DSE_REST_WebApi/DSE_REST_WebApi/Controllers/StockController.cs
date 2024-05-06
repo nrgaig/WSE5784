@@ -7,6 +7,13 @@ using System.Net.Http;
 using WSE_REST_WebApi.NewFolder;
 using Microsoft.CodeAnalysis;
 using WSE_REST_WebApi.Convertor;
+using System.Linq;
+using Microsoft.Extensions.Hosting;
+using System.Collections.ObjectModel;
+using System.Reflection.Metadata;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using NuGet.Packaging;
 
 namespace WSE_REST_WebApi.Controllers
 {
@@ -32,6 +39,30 @@ namespace WSE_REST_WebApi.Controllers
             if (_dbContext.Stocks == null) { return NotFound(); }
 
             return await _dbContext.Stocks.ToListAsync();
+        }
+
+        [HttpGet("stocks")]
+        public async Task<ActionResult<IEnumerable<Stock>>> GetStocksWithPrices(int stockId)
+        {
+            // Retrieve stocks from the database including TiingoPriceDtos
+           //var a= _dbContext.TiingoPriceDtos.Where(t => t.StockId == stockId).ToList();
+            var stocks = await _dbContext.GetTiingoFromStockId(stockId);
+            //var s = await GetStockId(stockId);
+            Stock s= await _dbContext.Stocks.FindAsync(stockId);
+            s.TiingoPriceDtos = stocks;
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                // Other options if needed
+            };
+
+            // Serialize the Stock object to JSON with circular references
+            var json = JsonSerializer.Serialize(s, options);
+
+            // Return the JSON string as ContentResult
+            return Content(json, "application/json");
+            return Ok(s);
         }
 
         //GET: api/Stock/tiingo/NVDA
@@ -115,14 +146,34 @@ namespace WSE_REST_WebApi.Controllers
         }
 
         //GET: api/Stock/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Stock>> GetStockId(int id)
+        [HttpGet("{stockId}")]
+        public async Task<ActionResult<Stock>> GetStockId(int stockId)
         {
             if (_dbContext.Stocks == null) { return NotFound(); }
 
-            var stock = await _dbContext.Stocks.FindAsync(id);
-            if (stock == null) { return NotFound(); }
-            return Ok(stock);
+            var stocks = await _dbContext.GetTiingoFromStockId(stockId);
+            //var s = await GetStockId(stockId);
+            Stock s = await _dbContext.Stocks.FindAsync(stockId);
+            s.TiingoPriceDtos = stocks;
+
+            //var stock = await _dbContext.Stocks.FindAsync(id);
+            if (s == null) { return NotFound(); }
+            var prices= await _dbContext.GetTiingoFromStockId(stockId);
+            s.TiingoPriceDtos = prices;
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                // Other options if needed
+            };
+
+            // Serialize the Stock object to JSON with circular references
+            var json = JsonSerializer.Serialize(s, options);
+
+            // Return the JSON string as ContentResult
+            return Content(json, "application/json");
+
+            return Ok(s);
         }
 
         //GET: /api/Stock/s/APPL
@@ -151,36 +202,6 @@ namespace WSE_REST_WebApi.Controllers
             return Ok(stocks);
         }
 
-        //// GET: /api/Stock/AboveValue/{value}
-        //[HttpGet("AboveValue/{value}")]
-        //public async Task<ActionResult<IEnumerable<Stock>>> GetStocksAboveValue(double value)
-        //{
-        //    if (_dbContext.Stocks == null) { return NotFound(); }
-
-        //    var stocks = await _dbContext.Stocks
-        //        .Where(s => s.Value > value)
-        //        .ToListAsync();
-
-        //    if (!stocks.Any()) { return NotFound(); }
-
-        //    return stocks;
-        //}
-
-        //// GET: /api/Stock/BelowValue/{value}
-        //[HttpGet("BelowValue/{value}")]
-        //public async Task<ActionResult<IEnumerable<Stock>>> GetStocksBelowValue(double value)
-        //{
-        //    if (_dbContext.Stocks == null) { return NotFound(); }
-
-        //    var stocks = await _dbContext.Stocks
-        //        .Where(s => s.Value < value)
-        //        .ToListAsync();
-
-        //    if (!stocks.Any()) { return NotFound(); }
-
-        //    return stocks;
-        //}
-
 
 
 
@@ -189,22 +210,42 @@ namespace WSE_REST_WebApi.Controllers
         [HttpPost("tiingoPost/{ticker}/db/{days}")]
         public async Task<ActionResult<Stock>> PostStock(string ticker, int days)
         {
-            var existStock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Ticker == ticker);
-            if (existStock != null) { return Ok(existStock); }
+            //var existStock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Ticker == ticker);
+            //if (existStock != null) { return Ok(existStock); }
             //לבדוק אם זה באמת הערך שצריך להחזיר
 
-
             var stock = new Stock();
+
             var stockQ = await TiingoService.GetStockId(ticker);
             if (stockQ == null) { return null; }
             var con = new JsonConverotr();
             stock = con.GetStockFromJson(stockQ);
+            stock.TiingoPriceDtos = new Collection<TiingoPriceDto>();
             var stockPrice = await TiingoService.GetStockIdPrice(ticker, days);
-            stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
-
+            //
+            //stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            //var lastElement = stock.EconomicDescription?.LastOrDefault();
+            
+            var EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            stock.TiingoPriceDtos.AddRange(EconomicDescription);
+            //stock.Value = lastElement.close;
             _dbContext.Stocks.Add(stock);
+
             await _dbContext.SaveChangesAsync();
-            return stock;
+
+            // Configure JsonSerializerOptions to support cycles
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                // Other options if needed
+            };
+
+            // Serialize the Stock object to JSON with circular references
+            var json = JsonSerializer.Serialize(stock, options);
+
+            // Return the JSON string as ContentResult
+            return Content(json, "application/json");
+            //return stock;
 
         }
 
@@ -265,12 +306,8 @@ namespace WSE_REST_WebApi.Controllers
 
         }
 
-        ////shtut
-        //[HttpGet("search")]
-        //public async Task<ActionResult<string>> Shtut(int x,int y)
-        //{
-        //    return Ok($"shtut about {x} and {y}\n");
-        //}
+   
+
 
 
         //GET: api/Stock/tiingo/NVDA/many/30
@@ -283,7 +320,10 @@ namespace WSE_REST_WebApi.Controllers
             var con = new JsonConverotr();
             stock = con.GetStockFromJson(stockQ);
             var stockPrice = await TiingoService.GetStockIdPrice(ticker, days);
-            stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            stock.TiingoPriceDtos = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            //var lastElement = stock.EconomicDescription?.LastOrDefault();
+
+            //stock.Value = lastElement.close;
             //stock.EconomicDescriptionJson = await TiingoService.GetStockIdPrice(ticker, days);
             return stock;
         }

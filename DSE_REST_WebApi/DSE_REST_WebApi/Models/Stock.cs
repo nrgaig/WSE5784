@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using WSE_REST_WebApi.Models;
 
 namespace WSE_REST_WebApi.Models
 {
@@ -12,10 +15,18 @@ namespace WSE_REST_WebApi.Models
 
         public string? Description { get; set; }
 
-        [NotMapped]
-        public List<TiingoPriceDto>? EconomicDescription { get; set; }
-        //public string? EconomicDescriptionJson { get; set; }
+
+        // Navigation property
+        public ICollection<TiingoPriceDto> TiingoPriceDtos { get; set; } = new List<TiingoPriceDto>();
+
+        public double? Value { get; set; }  
+
     }
 
 }
+
+
+//[NotMapped]
+//[JsonIgnore]
+//public List<TiingoPriceDto>? EconomicDescription { get; set; }
 
