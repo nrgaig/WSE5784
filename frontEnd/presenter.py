@@ -1,86 +1,77 @@
+from typing import Optional
 
-import MainWindow
+from frontEnd.MainWindow import MainWindow
+from frontEnd import Stock ,StockModel
 
-from stock import Stock
-class Presenter:
 #
 # The Presenter class is responsible for handling the logic of the application.
 # It receives input from the user and sends it to the model for processing.
 #
 
     # initializing the view and the list of stocks
-    def __init__(self,view, model):
+class Presenter:
+    # The Presenter class handles the application logic and mediates between the view and the model.
+    def __init__(self, view:MainWindow, model:Stock):
         self.view = view
         self.model = model
 
+        self.StockList=Optional[list[StockModel]]
 
-        
     def show_MainWindow(self):
-        self.main_window.set_current_view(MainWindow())
+        self.load_all_stocks()
+
+        self.view.show_main_window()
 
     def show_view2(self):
-        self.main_window.set_current_view(View2())
+        pass
 
-    def load_stocks(self):
-        stocks = self.model.get_all_stocks()
+    def load_all_stocks(self):
+        stocks:Optional[list[StockModel]] = self.model.get_all_stocks()
         if stocks:
             self.view.list_stocks(stocks)
         else:
             self.view.show_message("No stocks available")
 
-    # adding a stock to the list of stocks   
-    def add_stock_to_list(self,symbol, company_name, price):
-        stock = Stock(company_name=company_name, symbol=symbol, current_price=price)
-        self.stocks.append(stock)
-
-    # listing all the stocks
-    def list_stocks(self):
-        if not self.stocks:
-            print("No stocks available.")
+    def load_stock_by_id(self, stock_id):
+        stock = self.model.get_stock_by_id(stock_id)
+        if stock:
+            self.view.display_stock(stock)
         else:
-            self.view.list_stocks(self.stocks)
-    # showing a stock according to the symbol or the company name
-    def show_stock(self, symbol=None, company_name=None):
-        for stock in self.stocks:
-            if symbol and stock.symbol == symbol:
-                self.view.show_stock(stock)
-                return
-            elif company_name and stock.company_name == company_name:
-                self.view.show_stock(stock)
-                return
-        print("Stock not found") #TODO replace the message?
+            self.view.show_message("Stock not found")
 
-    # deleting a stock according to the symbol 
-    def delete_stock_by_symbol(self, symbol):
-        try:
-            delete_stock(symbol)
-            self.load_stocks()
-            self.view.show_message("Stock deleted successfully")
-        except Exception as e:
-            self.view.show_message(f"Error deleting stock: {e}")
+    def load_stock_by_symbol(self, symbol):
+        stock = self.model.get_stock_by_symbol(symbol)
+        if stock:
+            self.view.display_stock(stock)
+        else:
+            self.view.show_message("Stock not found")
 
-    # deleting a stock according to the company name
-    def delete_stock_by_company_name(self, company_name):
-        try:
-            delete_stock(company_name)
-            self.load_stocks()
-            self.view.show_message("Stock deleted successfully")
-        except Exception as e:
-            self.view.show_message(f"Error deleting stock: {e}")
-
-        try:
-            stock.delete_stock(company_name)
-            self.load_stocks()
-            self.view.show_message("Stock deleted successfully")
-        except Exception as e:
-            self.view.show_message(f"Error deleting stock: {e}")
-
-    def update_stock_price(self, symbol=None, company_name=None, new_price=None):
-        try:
-            update_stock(symbol, company_name, new_price)
-            self.load_stocks()
+    def update_stock(self, stock_id, data):
+        result = self.model.update_stock_by_id(stock_id, data)
+        if result:
             self.view.show_message("Stock updated successfully")
-        except Exception as e:
-            self.view.show_message(f"Error updating stock price: {e}")
+        else:
+            self.view.show_message("Failed to update stock")
+
+    def delete_stock(self, stock_id):
+        result = self.model.delete_stock_by_id(stock_id)
+        if result:
+            self.view.show_message("Stock deleted successfully")
+        else:
+            self.view.show_message("Failed to delete stock")
+
+    def load_stock_graph(self, symbol, date_from, source='tiingo'):
+        graph_data = self.model.get_stock_graph_by_symbol_from(symbol, date_from, source)
+        if graph_data:
+            self.view.display_stock_graph(graph_data)
+        else:
+            self.view.show_message("Stock graph data not available")
+
+    def post_ticker_data(self, ticker, days):
+        result = self.model.post_stock_ticker_data(ticker, days)
+        if result:
+            self.view.show_message("Ticker data posted successfully")
+        else:
+            self.view.show_message("Failed to post ticker data")
 
 
