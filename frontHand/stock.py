@@ -1,4 +1,5 @@
 #model
+
 class Stock: 
     __tablename__ = 'stocks'
     def __init__ (self, symbol, company_name, current_price):
@@ -8,6 +9,7 @@ class Stock:
 #TODO conect to the database
 
     def delete_stock(symbol):
+        
         pass
     def add_stock(symbol, company_name, price):
         pass
@@ -17,4 +19,3 @@ class Stock:
         pass
     def get_stock_by_company_name(company_name):
         pass
-        

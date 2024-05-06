@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>878</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="main_window" stdset="0">
+   <string>Share Portfolio Manager</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <item>
+     <widget class="QScrollBar" name="verticalScrollBar">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="infoFrame">
+      <widget class="QListView" name="StockExtendedDisplay">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>431</width>
+         <height>301</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Portfolio</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="listFrame">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>0</y>
+         <width>435</width>
+         <height>707</height>
+        </rect>
+       </property>
+       <widget class="QListView" name="StockDisplay">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>421</width>
+          <height>671</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Vivo Stock List</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>411</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="placeholderText">
+         <string>חפש כאן </string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QListView" name="StockGraph">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>380</y>
+         <width>431</width>
+         <height>301</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Portfolio</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>878</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>תיק המניות שלי</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>כל המניות</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAdd">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/add.png</normaloff>../../../Users/ziv52/.designer/icons/add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Stock</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/delete.png</normaloff>../../../Users/ziv52/.designer/icons/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Stock</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../Users/ziv52/.designer/icons/refresh.png</normaloff>../../../Users/ziv52/.designer/icons/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh List</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,24 +1,28 @@
-# from stock import Stock 
-# from view import View
-from stock import add_stock, delete_stock, update_stock, get_all_stocks
-from view import StockViewer
 
-# from frontHand.stock import Stock
-# from frontHand.view import StockViewer
+import MainWindow
 
+from stock import Stock
 class Presenter:
 #
 # The Presenter class is responsible for handling the logic of the application.
+# It receives input from the user and sends it to the model for processing.
 #
 
     # initializing the view and the list of stocks
-    def __init__(self):
-        self.view = StockViewer()
-      #  self.view.stock_list.itemClicked.connect(self.stock_clicked)
-        self.load_stocks()
+    def __init__(self,view, model):
+        self.view = view
+        self.model = model
+
+
+        
+    def show_MainWindow(self):
+        self.main_window.set_current_view(MainWindow())
+
+    def show_view2(self):
+        self.main_window.set_current_view(View2())
 
     def load_stocks(self):
-        stocks = get_all_stocks()
+        stocks = self.model.get_all_stocks()
         if stocks:
             self.view.list_stocks(stocks)
         else:
@@ -26,13 +30,8 @@ class Presenter:
 
     # adding a stock to the list of stocks   
     def add_stock_to_list(self,symbol, company_name, price):
-        try:
-            add_stock(symbol, company_name, price)
-            self.load_stocks()
-            self.view.show_message("Stock added successfully")
-        except Exception as e:
-            self.view.show_message(f"Error adding stock: {e}")
-
+        stock = Stock(company_name=company_name, symbol=symbol, current_price=price)
+        self.stocks.append(stock)
 
     # listing all the stocks
     def list_stocks(self):
@@ -68,7 +67,14 @@ class Presenter:
             self.view.show_message("Stock deleted successfully")
         except Exception as e:
             self.view.show_message(f"Error deleting stock: {e}")
-        
+
+        try:
+            stock.delete_stock(company_name)
+            self.load_stocks()
+            self.view.show_message("Stock deleted successfully")
+        except Exception as e:
+            self.view.show_message(f"Error deleting stock: {e}")
+
     def update_stock_price(self, symbol=None, company_name=None, new_price=None):
         try:
             update_stock(symbol, company_name, new_price)
@@ -76,21 +82,5 @@ class Presenter:
             self.view.show_message("Stock updated successfully")
         except Exception as e:
             self.view.show_message(f"Error updating stock price: {e}")
-        
 
-    #TODO check this method necessary
-    def buy_stock(self, symbol, quantity):
-        try:
-            #stock = 
-            self._buy_stock(symbol, quantity)
-        except Exception as e:
-            print(f"Error buying stock: {e}")
 
-        # for stock in self.stocks:
-        #     if stock.symbol == symbol:
-        #         stock.buy(quantity)
-        #         print(f"Bought {quantity} shares of {stock.symbol}")
-        #         return
-        # print(f"Stock with symbol {symbol} not found")
-
-        
