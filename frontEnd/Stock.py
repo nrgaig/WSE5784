@@ -1,9 +1,10 @@
 #model
 import json
-from StockModel import StockModel
+from StockModel import StockModel, tiingoPriceDtos
 from typing import Optional
 # The model is the part of the application that is responsible for managing the data. It receives input from the presenter and processes it.ֹ
 import requests
+DAYS = 30 # number of days to get the stock data
 class Stock:
     def __init__(self, base_url="http://localhost:5210/api/Stock"):
         self.base_url = base_url
@@ -14,7 +15,7 @@ class Stock:
             response = requests.get(f"{self.base_url}")
             response.raise_for_status()
             json_str = response.text
-            json_obj = json.load(json_str)
+            json_obj = json.loads(json_str)
             return [StockModel(**obj) for obj in json_obj]
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")
@@ -28,7 +29,7 @@ class Stock:
             response = requests.get(f"{self.base_url}/{stock_id}")
             response.raise_for_status()
             json_str = response.text
-            json_obj = json.load(json_str)
+            json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")
@@ -36,18 +37,29 @@ class Stock:
             print(f"Error getting stock: {e}")
         return None
 
-    def get_stock_by_symbol(self, symbol) -> Optional[StockModel]:
+    def get_stock_by_symbol(self, symbol,days=30) -> Optional[StockModel]:
         """Fetch a single stock by its symbol."""
         try:
-            response = requests.get(f"{self.base_url}/tiingo/{symbol}")
+            response = requests.get(f"{self.base_url}/TiingoPriceDtoList/{symbol}/db/{days}")
             response.raise_for_status()
             json_str = response.text
-            json_obj = json.load(json_str)
-            return StockModel(**json_obj)
+            json_obj = json.loads(json_str)
+            print(json_obj)
+            # return 1
+            return [tiingoPriceDtos(**obj) for obj in json_obj]
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")
         except requests.exceptions.RequestException as e:
             print(f"Error getting stock by symbol: {e}")
+        return None
+    def get_description_by_symbol(self, symbol) -> Optional[str]:
+        """Fetch a single stock description by its symbol."""
+        try:
+            return requests.get(f"{self.base_url}/StockDescription/{symbol}")
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error getting stock description: {e}")
         return None
 
     def update_stock_by_id(self, stock_id, data) -> Optional[StockModel]:
@@ -56,7 +68,7 @@ class Stock:
             response = requests.put(f"{self.base_url}/{stock_id}", json=data)
             response.raise_for_status()
             json_str = response.text
-            json_obj = json.load(json_str)
+            json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")
@@ -95,7 +107,7 @@ class Stock:
             response = requests.post(url)
             response.raise_for_status()
             json_str = response.text
-            json_obj = json.load(json_str)
+            json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")

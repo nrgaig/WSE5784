@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Net.WebRequestMethods;
-
-namespace WSE_REST_WebApi.NewFolder
+﻿namespace WSE_REST_WebApi.NewFolder
 {
     public class TiingoService
     {
@@ -11,7 +6,7 @@ namespace WSE_REST_WebApi.NewFolder
         private readonly static string frosToken = "78e2a84e3c3fd84749a6d9b171689dc4a08e8f7b";
         private static readonly string  BaseUrl = "https://api.tiingo.com/tiingo/";
 
-        public static async Task<string> GetStockId(string ticker)
+        public static async Task<string> GetStockByTicker(string ticker)
         {
             using (HttpClient _httpClient = new HttpClient())
             {
@@ -29,7 +24,7 @@ namespace WSE_REST_WebApi.NewFolder
             }
         }
 
-        public static async Task<string?> GetStockIdPrice(string ticker,int timespan)
+        public static async Task<string?> GetStockPrices(string ticker,int timespan)
         {
             using (HttpClient _httpClient = new HttpClient())
             {

@@ -1,15 +1,12 @@
 from typing import Optional
 import StockModel
 
+
 class presenter:
     def __init__(self, view, model):
         self.view = view
         self.model = model
         self.view.set_presenter(self)
-    def show_MainWindow(self):
-        self.view.show_main_window()
-        self.get_all_stocks()
-        self.view.show_main_window()
 
     def get_all_stocks(self):
         try:
@@ -26,32 +23,43 @@ class presenter:
         try:
             stock = self.model.get_stock_by_id(stock_id)
             if stock:
-                self.view.display_stock(stock)
+                return stock
             else:
                 self.view.show_message("Stock not found")
         except Exception as e:
             self.view.show_message(f"Error fetching stock: {str(e)}")
 
+
     def load_stock_by_symbol(self, symbol):
         try:
             stock = self.model.get_stock_by_symbol(symbol)
             if stock:
-                self.view.display_stock(stock)
+                return stock
             else:
                 self.view.show_message("Stock not found")
         except Exception as e:
             self.view.show_message(f"Error fetching stock by symbol: {str(e)}")
 
-    def update_stock(self, stock_id, data):
+    def load_description_by_symbol(self, symbol):
         try:
-            result = self.model.update_stock_by_id(stock_id, data)
-            if result:
-                self.view.show_message("Stock updated successfully")
-                self.load_stock_by_id(stock_id)  # Refresh the displayed stock
+            description = self.model.get_description_by_symbol(symbol)
+            if description:
+                return description.text
             else:
-                self.view.show_message("Failed to update stock")
+                self.view.show_message("Stock not found")
         except Exception as e:
-            self.view.show_message(f"Error updating stock: {str(e)}")
+            self.view.show_message(f"Error fetching stock description: {str(e)}")
+
+        def update_stock(self, stock_id, data):
+            try:
+                result = self.model.update_stock_by_id(stock_id, data)
+                if result:
+                    self.view.show_message("Stock updated successfully")
+                    self.load_stock_by_id(stock_id)  # Refresh the displayed stock
+                else:
+                    self.view.show_message("Failed to update stock")
+            except Exception as e:
+                self.view.show_message(f"Error updating stock: {str(e)}")
 
     def delete_stock(self, stock_id):
         try:
