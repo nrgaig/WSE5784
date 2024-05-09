@@ -87,6 +87,19 @@ class Stock:
             print(f"Error deleting stock: {e}")
         return None
 
+    def get_stock_graph_by_query(self, query):
+        """Retrieve stock graph data based on a query."""
+        try:
+            response = requests.get(f"{self.base_url}/q/{query}")
+            json_str = response.text
+            json_obj = json.loads(json_str)
+            return [StockModel(**obj) for obj in json_obj]
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error retrieving stock graph data: {e}")
+        return None
+
     def get_stock_graph_by_symbol_from(self, symbol, date_from, source='tiingo'):
         """Retrieve stock graph data from a specified source starting from a specific date."""
         try:

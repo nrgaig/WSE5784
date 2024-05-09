@@ -39,7 +39,15 @@ class presenter:
                 self.view.show_message("Stock not found")
         except Exception as e:
             self.view.show_message(f"Error fetching stock by symbol: {str(e)}")
-
+    def load_stock_by_query(self, query):
+        try:
+            stocks = self.model.get_stock_graph_by_query(query)
+            if stocks:
+                return stocks
+            else:
+                self.view.show_message("Stock not found")
+        except Exception as e:
+            self.view.show_message(f"Error fetching stock by query: {str(e)}")
     def load_description_by_symbol(self, symbol):
         try:
             description = self.model.get_description_by_symbol(symbol)
