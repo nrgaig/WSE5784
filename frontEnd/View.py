@@ -2,7 +2,7 @@ import sys
 
 from PySide6 import QtGui
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
-    QMessageBox, QMenuBar
+    QMessageBox, QMenuBar, QMenu
 import matplotlib
 matplotlib.use("Qt5Agg")
 from matplotlib.figure import Figure
@@ -34,7 +34,13 @@ class View(QMainWindow):
         self.list_view_3 = QListWidget()
         self.menuBar = QMenuBar()
         self.menuBar.setObjectName(u"menuBar")
+        self.menu = QMenu(self.menuBar)
+        self.menu.setObjectName(u"menu")
+        self.menu_2 = QMenu(self.menuBar)
+        self.menu_2.setObjectName(u"menu_2")
 
+        self.menuBar.addAction(self.menu.menuAction())
+        self.menuBar.addAction(self.menu_2.menuAction())
 
     def set_presenter(self, presenter):
         self.presenter = presenter
@@ -60,7 +66,7 @@ class View(QMainWindow):
         self.left_layout = QVBoxLayout()
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("חפש כאן")
-        # self.search_bar.textChanged.connect(self.presenter.search_stocks)
+        self.search_bar.textChanged.connect(self.on_search)
         self.left_layout.addWidget(self.search_bar)
         self.left_layout.addWidget(self.Stock_list_view)
 
@@ -95,7 +101,7 @@ class View(QMainWindow):
      #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
         # Method to handle search functionality
-        filtered_stocks = self.presenter.search_stocks(query)
+        filtered_stocks = self.presenter.load_stock_by_query(query)
         self.load_all_stocks(filtered_stocks)
     def load_all_stocks(self, stocks):
             self.Stock_list_view.clear()
