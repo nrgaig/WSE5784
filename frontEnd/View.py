@@ -1,8 +1,9 @@
 import sys
 
 from PySide6 import QtGui
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
-    QMessageBox, QMenuBar, QMenu
+    QMessageBox, QMenuBar, QMenu, QPushButton, QListWidgetItem, QTabWidget
 import matplotlib
 matplotlib.use("Qt5Agg")
 from matplotlib.figure import Figure
@@ -33,14 +34,21 @@ class View(QMainWindow):
         self.StockExtendedDisplay = QListWidget()
         self.list_view_3 = QListWidget()
         self.menuBar = QMenuBar()
-        self.menuBar.setObjectName(u"menuBar")
-        self.menu = QMenu(self.menuBar)
-        self.menu.setObjectName(u"menu")
-        self.menu_2 = QMenu(self.menuBar)
-        self.menu_2.setObjectName(u"menu_2")
 
-        self.menuBar.addAction(self.menu.menuAction())
-        self.menuBar.addAction(self.menu_2.menuAction())
+
+        action_s1=QAction("תיק מניות אישי",self)
+        action_s2=QAction("סקירה כללית",self)
+        action_s1.triggered.connect(self.set_protifolio_window)
+        action_s2.triggered.connect(self.set_main_window)
+        self.menu = QMenu("פעולות",self)
+        self.menuBar.addMenu(self.menu)
+        self.menu.addAction(action_s1)
+        self.menu.addAction(action_s2)
+
+
+
+        self.setMenuBar(self.menuBar)
+
 
     def set_presenter(self, presenter):
         self.presenter = presenter
@@ -62,6 +70,8 @@ class View(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.main_layout = QHBoxLayout(self.central_widget)
 
+        self.buy_button = QPushButton("Buy")
+        self.buy_button.clicked.connect(self.buy_stock)
         # Left layout for one list and the search bar
         self.left_layout = QVBoxLayout()
         self.search_bar = QLineEdit()
@@ -73,9 +83,10 @@ class View(QMainWindow):
         # Right layout for two lists
         self.right_layout = QVBoxLayout()
         self.plot_canvas = PlotCanvas(self, width=5, height=4, dpi=100)
-        self.menuBar = QMenuBar()
+
         self.right_layout.addWidget(self.StockExtendedDisplay)
         self.right_layout.addWidget(self.plot_canvas)
+        self.right_layout.addWidget(self.buy_button)
         self.right_layout.setSpacing(10)  # Add spacing between the two lists
 
         # Add both layouts to the main layout
@@ -93,6 +104,32 @@ class View(QMainWindow):
                    margin: 4px;
                }
            """)
+
+        # self.tabs=QTabWidget()
+        #
+        # self.tabs.setTabPosition(QTabWidget.TabPosition.North)
+        # self.tabs.setMovable(True)
+        #
+        # self.tab1 = QWidget()
+        # self.tab2 = QWidget()
+        # # lay = QVBoxLayout(self.central_widget)
+        # # lay.addWidget(self.tabs)
+        # self.setCentralWidget(self.tabs)
+        # self.tabs.addTab(self.tab1,"סקירה כללית")
+        # self.tabs.addTab(self.tab2,"תיק מניות אישי")
+        #
+        # # Add both layouts to the main layout
+        # self.main_layout.addWidget(self.tabs)
+
+        # Add widgets to tabs
+
+
+        # layout = QHBoxLayout()
+        # layout.addLayout(self.left_layout)
+        # layout.addLayout(self.right_layout)
+        # self.tabs.addTab(layout,"סקירה כללית")
+        # self.tabs.addTab(self.list_view_3,"תיק מניות אישי")
+
         # Set window properties
         self.setWindowTitle("List View Application")
         self.resize(1024, 768)
@@ -101,24 +138,33 @@ class View(QMainWindow):
      #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
         # Method to handle search functionality
-        filtered_stocks = self.presenter.load_stock_by_query(query)
-        self.load_all_stocks(filtered_stocks)
+        if query == "":
+            filtered_stocks = self.presenter.get_all_stocks()
+        else:
+            filtered_stocks = self.presenter.load_stock_by_query(query)
+        if filtered_stocks:
+            self.load_all_stocks(filtered_stocks)
+        else:
+            self.Stock_list_view.clear()
+            self.Stock_list_view.addItem("No results found")
     def load_all_stocks(self, stocks):
             self.Stock_list_view.clear()
             for stock in stocks:
-                self.Stock_list_view.addItem(f"{stock.Ticker}\n"
+                item = QListWidgetItem(f"{stock.Ticker}\n"
                                              f"{stock.Name}\n")
+                self.Stock_list_view.addItem(item)
             self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
-        # load specific stock
 
+    #
 
     def show_message(self, message):
         QMessageBox.information(self, "Message", message)
     def on_item_clicked(self, item):
         self.StockExtendedDisplay.clear()
-        self.StockExtendedDisplay
+
         tickerItem = item.text().split('\n')[0]
+        self.presenter.current_stock = tickerItem
         ItemDescription = self.presenter.load_description_by_symbol(tickerItem)
         self.StockExtendedDisplay.addItem(f"Description: {ItemDescription}\n")
         self.StockExtendedDisplay.setWordWrap(True)
@@ -130,4 +176,31 @@ class View(QMainWindow):
             self.plot_canvas.plot_data([d.Close for d in tingoDtoList],'g')
         else:
             self.plot_canvas.plot_data([d.Close for d in tingoDtoList])
+
+
+
+    def set_protifolio_window(self):
+        self.Stock_list_view.clear()
+        self.StockExtendedDisplay.clear()
+        self.list_view_3.clear()
+        # self.plot_canvas.plot_data(data, 'w')
+        list = self.presenter.get_list()
+        for stock in list:
+            s =  self.presenter.load_stock_by_query_val(stock)
+            item = QListWidgetItem(f"{s.Ticker}\n"
+                                   f"{s.Name}\n" f"{s.Value}\n")
+            self.Stock_list_view.addItem(item)
+        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
+
+    def set_main_window(self):
+        self.Stock_list_view.clear()
+        self.StockExtendedDisplay.clear()
+        data = None
+        # self.plot_canvas.plot_data(data , 'w')
+        self.load_all_stocks(self.presenter.get_all_stocks())
+    def buy_stock(self, stock):
+        # Here you can implement what happens when the buy button is clicked
+        self.presenter.add_stock_to_list(self.presenter.current_stock)
+
+
 

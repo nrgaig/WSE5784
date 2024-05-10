@@ -3,6 +3,7 @@
     public class TiingoService
     {
         //private readonly static HttpClient _httpClient;
+        //private readonly static string frosToken = "c00763a6f2b64790607b05e4b2a9d20efbdcde10";
         private readonly static string frosToken = "78e2a84e3c3fd84749a6d9b171689dc4a08e8f7b";
         private static readonly string  BaseUrl = "https://api.tiingo.com/tiingo/";
 

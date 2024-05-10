@@ -1,5 +1,7 @@
 #model
 import json
+
+from StockList import StockList
 from StockModel import StockModel, tiingoPriceDtos
 from typing import Optional
 # The model is the part of the application that is responsible for managing the data. It receives input from the presenter and processes it.ֹ
@@ -8,7 +10,17 @@ DAYS = 30 # number of days to get the stock data
 class Stock:
     def __init__(self, base_url="http://localhost:5210/api/Stock"):
         self.base_url = base_url
+        self.Stock_list = []
 
+    def load_stock_to_list(self, ticker):
+        self.Stock_list.append(ticker)
+        if self.Stock_list[-1]:
+            return True
+        return False
+
+
+    def get_list(self):
+        return self.Stock_list
     def get_all_stocks(self) -> Optional[list[StockModel]]:
         """Fetch all stocks."""
         try:
@@ -22,7 +34,18 @@ class Stock:
         except requests.exceptions.RequestException as e:
             print(f"Error getting stocks: {e}")
         return None
-
+    def get_stock_by_query_val(self, query):
+        try:
+            response = requests.get(f"{self.base_url}/s+dayprice/{query}")
+            response.raise_for_status()
+            json_str = response.text
+            json_obj = json.loads(json_str)
+            return StockModel(**json_obj)
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error getting stocks: {e}")
+        return None
     def get_stock_by_id(self, stock_id) -> Optional[StockModel] :
         """Fetch a single stock by its database ID."""
         try:

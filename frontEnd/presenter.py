@@ -6,7 +6,10 @@ class presenter:
     def __init__(self, view, model):
         self.view = view
         self.model = model
+        self.current_stock: Optional[StockModel] = None
         self.view.set_presenter(self)
+
+
 
     def get_all_stocks(self):
         try:
@@ -36,7 +39,13 @@ class presenter:
             if stock:
                 return stock
             else:
-                self.view.show_message("Stock not found")
+                stock = self.model.post_stock_ticker_data(symbol,30)
+            if stock:
+                return stock
+            else:
+                print("Stock not found")
+                return None
+
         except Exception as e:
             self.view.show_message(f"Error fetching stock by symbol: {str(e)}")
     def load_stock_by_query(self, query):
@@ -47,7 +56,7 @@ class presenter:
             else:
                 self.view.show_message("Stock not found")
         except Exception as e:
-            self.view.show_message(f"Error fetching stock by query: {str(e)}")
+            print(f"Error fetching stock by query: {str(e)}")
     def load_description_by_symbol(self, symbol):
         try:
             description = self.model.get_description_by_symbol(symbol)
@@ -79,7 +88,26 @@ class presenter:
                 self.view.show_message("Failed to delete stock")
         except Exception as e:
             self.view.show_message(f"Error deleting stock: {str(e)}")
-
+    def get_list(self):
+        return self.model.get_list()
+    def add_stock_to_list(self, ticker):
+        try:
+            result = self.model.load_stock_to_list(ticker)
+            if result:
+                self.view.show_message("Stock added successfully")
+            else:
+                self.view.show_message("Failed to add stock")
+        except Exception as e:
+            self.view.show_message(f"Error adding stock: {str(e)}")
+    def load_stock_by_query_val(self, query):
+        try:
+            stock = self.model.get_stock_by_query_val(query)
+            if stock:
+                return stock
+            else:
+                self.view.show_message("Stock not found")
+        except Exception as e:
+            self.view.show_message(f"Error fetching stock by query: {str(e)}")
     def load_stock_graph(self, symbol, date_from, source='tiingo'):
         try:
             graph_data = self.model.get_stock_graph_by_symbol_from(symbol, date_from, source)

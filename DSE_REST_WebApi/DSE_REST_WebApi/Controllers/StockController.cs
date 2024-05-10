@@ -46,6 +46,7 @@ namespace WSE_REST_WebApi.Controllers
         {
             // Retrieve stocks from the database including TiingoPriceDtos
            //var a= _dbContext.TiingoPriceDtos.Where(t => t.StockId == stockId).ToList();
+
             var stocks = await _dbContext.GetTiingoPricesFromStockId(stockId);
             //var s = await GetStockId(stockId);
             Stock s= await _dbContext.Stocks.FindAsync(stockId);
@@ -63,6 +64,30 @@ namespace WSE_REST_WebApi.Controllers
             // Return the JSON string as ContentResult
             return Content(json, "application/json");
             return Ok(s);
+        }
+
+        [HttpGet("stocks/{input}")]
+        public async Task<ActionResult<IEnumerable<Stock>>> GetStocksWithPricesByString(string input)
+        {
+            // Retrieve stocks from the database including TiingoPriceDtos
+            //var a= _dbContext.TiingoPriceDtos.Where(t => t.StockId == stockId).ToList();
+            var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Name == input || s.Ticker == input);
+            var stockPrice = await _dbContext.GetTiingoPricesFromStockId(stock.Id);
+            //var s = await GetStockId(stockId);
+            stock.TiingoPriceDtos = stockPrice;
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                // Other options if needed
+            };
+
+            // Serialize the Stock object to JSON with circular references
+            var json = JsonSerializer.Serialize(stock, options);
+
+            // Return the JSON string as ContentResult
+            return Content(json, "application/json");
+            return Ok(stock);
         }
 
         //GET: api/Stock/tiingo/NVDA
@@ -142,6 +167,7 @@ namespace WSE_REST_WebApi.Controllers
         {
             if (_dbContext.Stocks == null) { return NotFound(); }
 
+
             var stocks = await _dbContext.GetTiingoPricesFromStockId(stockId);
             //var s = await GetStockId(stockId);
             Stock s = await _dbContext.Stocks.FindAsync(stockId);
@@ -166,6 +192,24 @@ namespace WSE_REST_WebApi.Controllers
 
             return Ok(s);
         }
+
+        //GET: /api/Stock/s/APPL
+        [HttpGet("s+dayprice/{ticker}")]
+        public async Task<ActionResult<Stock>> GetStockDailyByTicker(string ticker)
+        {
+            if (_dbContext.Stocks == null) { return NotFound(); }
+
+            var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Ticker == ticker);
+            if (stock == null) { return NotFound(); }
+            var con = new JsonConverotr();
+            var stockPrice = await TiingoService.GetStockPrices(ticker, 1);
+            var TiingoPriceDtos = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+            stock.Value = TiingoPriceDtos.FirstOrDefault().close;
+            //stock.Open = TiingoPriceDtos.FirstOrDefault().open;
+
+            return Ok(stock);
+        }
+
 
         //GET: /api/Stock/s/APPL
         [HttpGet("s/{input}")]

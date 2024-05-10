@@ -19,7 +19,10 @@ namespace WSE_REST_WebApi.Models
         // Navigation property
         public ICollection<TiingoPriceDto> TiingoPriceDtos { get; set; } = new List<TiingoPriceDto>();
 
-        public double? Value { get; set; }  
+        public double? Value { get; set; }
+        //public double? Open { get; set; }
+
+
 
     }
 
