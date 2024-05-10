@@ -5,10 +5,7 @@ namespace WSE_REST_WebApi.Convertor
 {
     public class JsonConverotr
     {
-        //public IEnumerable<TiingoPriceDto>? GetStockObjFromJson(string json)
-        //{
-        //    return JsonStockDeserialization.GetSearchResults(json);
-        //}
+        
 
         public IEnumerable<TiingoPriceDto> GetStockObjFromJson(string json)
         {
@@ -120,50 +117,7 @@ namespace WSE_REST_WebApi.Convertor
                 ).ToList();
             }
 
-            //private static TiingoPriceDto convertTiingoPriceToTiingoPriceDto(TiingoPrice res)
-            //{
-            //    // parsing the year for movie
-            //    if (!double.TryParse(res.close, out double close))
-            //    {
-            //        close = 0;
-            //    }
-            //    if (!double.TryParse(res.high, out double high))
-            //    {
-            //        high = 0;
-            //    }
-            //    if (!double.TryParse(res.low, out double low))
-            //    {
-            //        low = 0;
-            //    }
-            //    if (!double.TryParse(res.open, out double open))
-            //    {
-            //        open = 0;
-            //    }
-            //    if (!double.TryParse(res.volume, out double volume))
-            //    {
-            //        volume = 0;
-            //    }
-
-            //    if (!double.TryParse(res.divCash, out double divCash))
-            //    {
-            //        divCash = 0;
-            //    }
-            //    if (!double.TryParse(res.splitFactor, out double splitFactor))
-            //    {
-            //        splitFactor = 0;
-            //    }
-            //    return new TiingoPriceDto
-            //    {
-            //        date = res.date,
-            //        close = close,
-            //        high = high,
-            //        low = low,
-            //        open = open,
-            //        volume = volume,
-            //        divCash = divCash,
-            //        splitFactor = splitFactor
-            //    };
-            //}
+      
 
             public static Stock? GetStockResult(string json)
             {

@@ -18,9 +18,8 @@ class StockList:
                 return stock
         return None
     def AddStock(self, ticker):
-        stock = self.Stock.get_stock_by_symbol(ticker)
-        self.stocks.append(stock)
-        if stock:
+        self.stocks.append(ticker)
+        if ticker:
             return True
         return False
 
