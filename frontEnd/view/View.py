@@ -1,14 +1,11 @@
-import sys
-
-from PySide6 import QtGui
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
-    QMessageBox, QMenuBar, QMenu, QPushButton, QListWidgetItem, QTabWidget
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
+    QMessageBox, QMenuBar, QMenu, QPushButton, QListWidgetItem
 import matplotlib
 matplotlib.use("Qt5Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import presenter
+
 
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -34,8 +31,10 @@ class View(QMainWindow):
         self.StockExtendedDisplay = QListWidget()
         self.list_view_3 = QListWidget()
         self.menuBar = QMenuBar()
+        self.delete_button = QPushButton("Delete")
 
-
+        self.delete_button.setEnabled(False)
+        self.buy_button = QPushButton("Buy")
         action_s1=QAction("תיק מניות אישי",self)
         action_s2=QAction("סקירה כללית",self)
         action_s1.triggered.connect(self.set_protifolio_window)
@@ -87,6 +86,9 @@ class View(QMainWindow):
         self.right_layout.addWidget(self.StockExtendedDisplay)
         self.right_layout.addWidget(self.plot_canvas)
         self.right_layout.addWidget(self.buy_button)
+        self.right_layout.addWidget(self.delete_button)
+        self.delete_button.setStyleSheet("background-color: red")
+        self.buy_button.setStyleSheet("background-color: green")
         self.right_layout.setSpacing(10)  # Add spacing between the two lists
 
         # Add both layouts to the main layout
@@ -151,7 +153,7 @@ class View(QMainWindow):
             self.Stock_list_view.clear()
             for stock in stocks:
                 item = QListWidgetItem(f"{stock.Ticker}\n"
-                                             f"{stock.Name}\n")
+                                             f"{stock.Name}\n" f"{stock.Value}\n")
                 self.Stock_list_view.addItem(item)
             self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
@@ -190,14 +192,23 @@ class View(QMainWindow):
             item = QListWidgetItem(f"{s.Ticker}\n"
                                    f"{s.Name}\n" f"{s.Value}\n")
             self.Stock_list_view.addItem(item)
+
+        self.buy_button.setEnabled(False)
+        self.delete_button.setEnabled(True)
+        self.delete_button.clicked.connect(self.delete_stock)
         self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
+    def delete_stock(self):
+        self.presenter.delete_stock_by_symbol(self.presenter.current_stock)
+        self.set_protifolio_window()
     def set_main_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
-        data = None
-        # self.plot_canvas.plot_data(data , 'w')
+
+        self.buy_button.setEnabled(True)
+        self.delete_button.setEnabled(False)
         self.load_all_stocks(self.presenter.get_all_stocks())
+        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
     def buy_stock(self, stock):
         # Here you can implement what happens when the buy button is clicked
         self.presenter.add_stock_to_list(self.presenter.current_stock)

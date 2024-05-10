@@ -14,6 +14,7 @@ using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using NuGet.Packaging;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WSE_REST_WebApi.Controllers
 {
@@ -253,6 +254,22 @@ namespace WSE_REST_WebApi.Controllers
         }
 
 
+        ////GET: /api/Stock/q/APPL/30
+        //[HttpGet("DataBase/{ticker}/db/{days}")]
+        //public async Task<ActionResult<IEnumerable<TiingoPriceDto>>> GetTiingPriceListDatabase(string ticker)
+        //{
+        //    //var stockPrice = await TiingoService.GetStockPrices(ticker, days);
+        //    //
+        //    //stock.EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
+        //    //var lastElement = stock.EconomicDescription?.LastOrDefault();
+        //    var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Ticker == ticker);
+        //    int stockId = stock.Id;
+        //    var prices = await _dbContext.GetTiingoPricesFromStockId(stockId);
+        //    var con = new JsonConverotr();
+        //    var EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(prices));
+        //    return EconomicDescription;
+
+        //}
 
         //GET: /api/Stock/q/APPL/30
         [HttpGet("TiingoPriceDtoList/{ticker}/db/{days}")]
@@ -292,6 +309,12 @@ namespace WSE_REST_WebApi.Controllers
             
             var EconomicDescription = new List<TiingoPriceDto>(con.GetStockObjFromJson(stockPrice));
             stock.TiingoPriceDtos.AddRange(EconomicDescription);
+            var lastElement = EconomicDescription.LastOrDefault();
+            if (lastElement != null)
+            {
+                stock.Value = lastElement.close;
+                //stock.Open = lastElement.open;
+            }
             //stock.Value = lastElement.close;
             _dbContext.Stocks.Add(stock);
 

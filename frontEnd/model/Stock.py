@@ -1,8 +1,7 @@
 #model
 import json
 
-from StockList import StockList
-from StockModel import StockModel, tiingoPriceDtos
+from model.StockModel import StockModel, tiingoPriceDtos
 from typing import Optional
 # The model is the part of the application that is responsible for managing the data. It receives input from the presenter and processes it.ֹ
 import requests
@@ -59,7 +58,12 @@ class Stock:
         except requests.exceptions.RequestException as e:
             print(f"Error getting stock: {e}")
         return None
-
+    def delete_stock_by_symbol_from_list(self, symbol):
+        for stock in self.Stock_list:
+            if stock == symbol:
+                self.Stock_list.remove(stock)
+                return True
+        return False
     def get_stock_by_symbol(self, symbol,days=30) -> Optional[StockModel]:
         """Fetch a single stock by its symbol."""
         try:
@@ -114,9 +118,12 @@ class Stock:
         """Retrieve stock graph data based on a query."""
         try:
             response = requests.get(f"{self.base_url}/q/{query}")
-            json_str = response.text
-            json_obj = json.loads(json_str)
-            return [StockModel(**obj) for obj in json_obj]
+            if response.status_code == 200:
+                json_str = response.text
+                json_obj = json.loads(json_str)
+                return [StockModel(**obj) for obj in json_obj]
+            elif response.status_code == 404:
+                return self.post_stock_ticker_data(query, 30)
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred: {e}")
         except requests.exceptions.RequestException as e:

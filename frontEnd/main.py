@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication
-from View import View
-from Stock import Stock
-from presenter import presenter
+from view.View import View
+from model.Stock import Stock
+from presnter.presenter import presenter
 import sys
 def setup_mvp():
     model = Stock()

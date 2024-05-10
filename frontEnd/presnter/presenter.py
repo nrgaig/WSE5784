@@ -1,5 +1,6 @@
 from typing import Optional
-import StockModel
+from model import StockModel
+
 
 
 class presenter:
@@ -77,7 +78,8 @@ class presenter:
                     self.view.show_message("Failed to update stock")
             except Exception as e:
                 self.view.show_message(f"Error updating stock: {str(e)}")
-
+    def delete_stock_by_symbol(self, symbol):
+        self.model.delete_stock_by_symbol_from_list(symbol)
     def delete_stock(self, stock_id):
         try:
             result = self.model.delete_stock_by_id(stock_id)
