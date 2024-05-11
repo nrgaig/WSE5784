@@ -40,9 +40,9 @@ class Stock:
             json_obj = json.loads(json_str)
             return [StockModel(**obj) for obj in json_obj]
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred get_all_stocks: {e}")
         except requests.exceptions.RequestException as e:
-            print(f"Error getting stocks: {e}")
+            print(f"Error getting stocks get_all_stocks: {e}")
         return None
 
     def get_stock_and_history_by_id_db(self, stock_id) -> Optional[StockModel]:
@@ -54,9 +54,9 @@ class Stock:
             json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred get_stock_by_query_val: {e}")
         except requests.exceptions.RequestException as e:
-            print(f"Error getting stock: {e}")
+            print(f"Error getting stocks get_stock_by_query_val: {e}")
         return None
 
     def get_stock_and_history_by_ticker_db(self, ticker) -> Optional[StockModel]:
@@ -68,8 +68,9 @@ class Stock:
             json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred get_stock_by_id: {e}")
         except requests.exceptions.RequestException as e:
+            print(f"Error getting stock get_stock_by_id: {e}")
             print(f"Error getting stock: {e}")
 
     def get_stock_by_ticker_tiingo(self, ticker) -> Optional[StockModel]:
@@ -139,9 +140,9 @@ class Stock:
             # return 1
             return [tiingoPriceDtos(**obj) for obj in json_obj]
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred in priceList: {e}")
         except requests.exceptions.RequestException as e:
-            print(f"Error getting stock by symbol: {e}")
+            print(f"Error getting stock by symbol in priceList: {e}")
         return None
 
     def get_description_by_symbol(self, symbol) -> Optional[str]:
@@ -149,9 +150,9 @@ class Stock:
         try:
             return requests.get(f"{self.base_url}/StockDescription/{symbol}")
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred in fetching description: {e}")
         except requests.exceptions.RequestException as e:
-            print(f"Error getting stock description: {e}")
+            print(f"Error getting stock in fetching description: {e}")
         return None
 
     def update_stock_by_id(self, stock_id, data) -> Optional[StockModel]:
@@ -163,7 +164,7 @@ class Stock:
             json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred in updating stock: {e}")
         except requests.exceptions.RequestException as e:
             print(f"Error updating stock: {e}")
         return None
@@ -174,9 +175,25 @@ class Stock:
             response = requests.delete(f"{self.base_url}/{stock_id}")
             return response.status_code == 204
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred in deleting stock: {e}")
         except requests.exceptions.RequestException as e:
             print(f"Error deleting stock: {e}")
+        return None
+
+    def get_stock_details_from_db_by_query(self, query):
+        """Retrieve stock graph data based on a query."""
+        try:
+            response = requests.get(f"{self.base_url}/q/{query}")
+            if response.status_code == 200:
+                json_str = response.text
+                json_obj = json.loads(json_str)
+                return [StockModel(**obj) for obj in json_obj]
+            elif response.status_code == 404:
+               pass # return self.post_stock_ticker_data(query, 30)
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred retrieving stock graph: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error retrieving stock graph data: {e}")
         return None
 
     def get_stock_graph_by_symbol_from(self, symbol, date_from, source='tiingo'):
@@ -187,9 +204,9 @@ class Stock:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred stock_graph_by_symbol: {e}")
         except requests.exceptions.RequestException as e:
-            print(f"Error retrieving stock graph data: {e}")
+            print(f"Error retrieving stock_graph_by_symbol: {e}")
         return None
 
     def post_stock_ticker_data(self, ticker, days):
@@ -202,7 +219,7 @@ class Stock:
             json_obj = json.loads(json_str)
             return StockModel(**json_obj)
         except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {e}")
+            print(f"HTTP error occurred post_stock_ticker_data: {e}")
         except requests.exceptions.RequestException as e:
             print(f"Error posting stock ticker data: {e}")
         return None

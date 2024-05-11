@@ -100,6 +100,8 @@ class presenter:
                 return stock
             else:
                 print("Stock not found")
+                return None
+
         except Exception as e:
             print(f"Error fetching stock: {str(e)}")
 
@@ -107,11 +109,9 @@ class presenter:
     def load_stock_by_query_db(self, query):
         """ return stock by query from the model db """
         try:
-            stocks = self.model.get_stock_by_query_db(query)
-            if stocks:
-                return stocks
-            else:
-                self.view.show_message("Stock not found")
+
+            return self.model.get_stock_details_from_db_by_query(query)
+
         except Exception as e:
             print(f"Error fetching stock by query: {str(e)}")
 
@@ -185,7 +185,7 @@ class presenter:
         except Exception as e:
             self.view.show_message(f"Error loading stock graph: {str(e)}")
 
-    def post_ticker_data(self, ticker, days):
+    def post_ticker_data(self, ticker, days=30):
         """add stock the db from tiingo api"""
         try:
             result = self.model.post_stock_ticker_data(ticker, days)
@@ -195,7 +195,3 @@ class presenter:
                 self.view.show_message("Failed to post ticker data")
         except Exception as e:
             self.view.show_message(f"Error posting ticker data: {str(e)}")
-
-
-
-

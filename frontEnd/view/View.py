@@ -29,6 +29,7 @@ class View(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.query = None
         self.presenter = None
 
     def set_presenter(self, presenter):
@@ -50,6 +51,9 @@ class View(QMainWindow):
         self.buy_button.clicked.connect(self.buy_stock)
         self.delete_button.setStyleSheet("background-color: red" "font color: white")
         self.buy_button.setStyleSheet("background-color: green" "font color: white")
+        search_button=QPushButton("🔍")
+        search_button.clicked.connect(self.on_APIsearch)
+
 
         # Menu bar
         self.menuBar = QMenuBar()
@@ -76,7 +80,11 @@ class View(QMainWindow):
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("חפש כאן")
         self.search_bar.textChanged.connect(self.on_search)
-        self.left_layout.addWidget(self.search_bar)
+        search_layout=QHBoxLayout()
+        search_layout.addWidget(self.search_bar)
+        search_layout.addWidget(search_button)
+        self.left_layout.addLayout(search_layout)
+
         self.left_layout.addWidget(self.Stock_list_view)
 
         # Right layout for two lists
@@ -116,17 +124,23 @@ class View(QMainWindow):
     #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
         # Method to handle search functionality
+        self.query = query
+        self.Stock_list_view.clear()
         if query == "":
             filtered_stocks = self.presenter.get_all_stocks_db()
         else:
             filtered_stocks = self.presenter.load_stock_by_query_db(query) #or []
-            self.Stock_list_view.clear()
-            self.Stock_list_view.load_all_stocks(filtered_stocks)
-        # if filtered_stocks:
-        #     self.load_all_stocks(filtered_stocks)
-                else:
-                     self.Stock_list_view.clear()
-                     self.Stock_list_view.addItem("No results found")
+        if filtered_stocks:
+            for stock in filtered_stocks:
+                if stock:
+                    item = QListWidgetItem(f"{stock.Ticker}\n"
+                                           f"{stock.Name}\n" f"{stock.Value}\n")
+                    self.Stock_list_view.addItem(item)
+        else:
+            # self.Stock_list_view.clear()
+            self.Stock_list_view.addItem("No results found")
+
+
 
     def load_all_stocks(self, stocks):
         self.Stock_list_view.clear()
@@ -149,19 +163,21 @@ class View(QMainWindow):
         ItemDescription = self.presenter.load_description_by_symbol(tickerItem)
         self.StockExtendedDisplay.addItem(f"Description: {ItemDescription}\n")
         self.StockExtendedDisplay.setWordWrap(True)
-        tingoDtoList = self.presenter.load_stock_by_ticker_from_tiingo(tickerItem)
-        if tingoDtoList:
-            for ting in tingoDtoList:
+#        tingoDtoList = self.presenter.load_priceList_by_symbol(tickerItem)
+        tiingoPricesList = self.presenter.load_stock_by_ticker_from_tiingo(tickerItem)
+        if tiingoPricesList:
+            for ting in tiingoPricesList:
                 self.StockExtendedDisplay.addItem(
                     f"Date: {ting.Date}   " + f"Close: {ting.Close}   " + f"High: {ting.High}\n" + f"Low: {ting.Low}   " + f"Open: {ting.Open}   " + f"Volume: {ting.Volume}\n")
-        if tingoDtoList[0].Close < tingoDtoList[-1].Close:
-            self.plot_canvas.plot_data([d.Close for d in tingoDtoList], 'g')
-        else:
-            self.plot_canvas.plot_data([d.Close for d in tingoDtoList])
+            if tiingoPricesList[0].Close < tiingoPricesList[-1].Close:
+                self.plot_canvas.plot_data([d.Close for d in tiingoPricesList], 'g')
+            else:
+                self.plot_canvas.plot_data([d.Close for d in tiingoPricesList])
 
     def set_protifolio_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
+        #self.plot_canvas.
 
         # self.plot_canvas.plot_data(data, 'w')
         list = self.presenter.get_list()
@@ -174,7 +190,7 @@ class View(QMainWindow):
         self.buy_button.setEnabled(False)
         self.delete_button.setEnabled(True)
         self.delete_button.clicked.connect(self.delete_stock)
-        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
+        self.Stock_list_view.clicked.connect(self.on_item_clicked)
 
     def delete_stock(self):
         self.presenter.delete_stock_by_symbol(self.presenter.current_stock)
@@ -192,3 +208,16 @@ class View(QMainWindow):
     def buy_stock(self, stock):
         # Here you can implement what happens when the buy button is clicked
         self.presenter.add_stock_to_list(self.presenter.current_stock)
+
+    def on_APIsearch(self):
+        print(self.query)
+        stock = self.presenter.load_stock_by_query_db(self.query)
+        if stock:
+            self.load_all_stocks(stock)
+        else:
+            stock=self.presenter.post_ticker_data(self.query)
+            if stock:
+                self.load_all_stocks(stock)
+            else:
+                print("error postin search button")
+
