@@ -41,6 +41,7 @@ class View(QMainWindow):
 
         self.Stock_list_view = QListWidget()
         self.StockExtendedDisplay = QListWidget()
+        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
         # buttons
         self.delete_button = QPushButton("Delete")
@@ -51,9 +52,8 @@ class View(QMainWindow):
         self.buy_button.clicked.connect(self.buy_stock)
         self.delete_button.setStyleSheet("background-color: red" "font color: white")
         self.buy_button.setStyleSheet("background-color: green" "font color: white")
-        search_button=QPushButton("🔍")
+        search_button = QPushButton("🔍 tiingo search")
         search_button.clicked.connect(self.on_APIsearch)
-
 
         # Menu bar
         self.menuBar = QMenuBar()
@@ -80,7 +80,7 @@ class View(QMainWindow):
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("חפש כאן")
         self.search_bar.textChanged.connect(self.on_search)
-        search_layout=QHBoxLayout()
+        search_layout = QHBoxLayout()
         search_layout.addWidget(self.search_bar)
         search_layout.addWidget(search_button)
         self.left_layout.addLayout(search_layout)
@@ -129,7 +129,7 @@ class View(QMainWindow):
         if query == "":
             filtered_stocks = self.presenter.get_all_stocks_db()
         else:
-            filtered_stocks = self.presenter.load_stock_by_query_db(query) #or []
+            filtered_stocks = self.presenter.load_stock_by_query_db(query)  # or []
         if filtered_stocks:
             for stock in filtered_stocks:
                 if stock:
@@ -140,15 +140,12 @@ class View(QMainWindow):
             # self.Stock_list_view.clear()
             self.Stock_list_view.addItem("No results found")
 
-
-
     def load_all_stocks(self, stocks):
         self.Stock_list_view.clear()
         for stock in stocks:
             item = QListWidgetItem(f"{stock.Ticker}\n"
                                    f"{stock.Name}\n" f"{stock.Value}\n")
             self.Stock_list_view.addItem(item)
-        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
     #
 
@@ -163,7 +160,7 @@ class View(QMainWindow):
         ItemDescription = self.presenter.load_description_by_symbol(tickerItem)
         self.StockExtendedDisplay.addItem(f"Description: {ItemDescription}\n")
         self.StockExtendedDisplay.setWordWrap(True)
-#        tingoDtoList = self.presenter.load_priceList_by_symbol(tickerItem)
+        #        tingoDtoList = self.presenter.load_priceList_by_symbol(tickerItem)
         tiingoPricesList = self.presenter.load_stock_by_ticker_from_tiingo(tickerItem)
         if tiingoPricesList:
             for ting in tiingoPricesList:
@@ -177,7 +174,7 @@ class View(QMainWindow):
     def set_protifolio_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
-        #self.plot_canvas.
+        # self.plot_canvas.
 
         # self.plot_canvas.plot_data(data, 'w')
         list = self.presenter.get_list()
@@ -189,8 +186,6 @@ class View(QMainWindow):
 
         self.buy_button.setEnabled(False)
         self.delete_button.setEnabled(True)
-        self.delete_button.clicked.connect(self.delete_stock)
-        self.Stock_list_view.clicked.connect(self.on_item_clicked)
 
     def delete_stock(self):
         self.presenter.delete_stock_by_symbol(self.presenter.current_stock)
@@ -203,7 +198,6 @@ class View(QMainWindow):
         self.buy_button.setEnabled(True)
         self.delete_button.setEnabled(False)
         self.load_all_stocks(self.presenter.get_all_stocks_db())
-        self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
     def buy_stock(self, stock):
         # Here you can implement what happens when the buy button is clicked
@@ -211,13 +205,10 @@ class View(QMainWindow):
 
     def on_APIsearch(self):
         print(self.query)
-        stock = self.presenter.load_stock_by_query_db(self.query)
+        stock = self.presenter.post_ticker_data(self.query)
         if stock:
+            stock = self.presenter.load_stock_by_query_db(self.query)
+            self.Stock_list_view.clear()
             self.load_all_stocks(stock)
         else:
-            stock=self.presenter.post_ticker_data(self.query)
-            if stock:
-                self.load_all_stocks(stock)
-            else:
-                print("error postin search button")
-
+            print("error postin search button")

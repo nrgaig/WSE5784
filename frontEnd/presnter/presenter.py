@@ -69,16 +69,16 @@ class presenter:
             self.view.show_message(f"Error fetching stock: {str(e)}")
 
     # return stock by symbol from the model db
-    def load_stock_and_history_by_ticker_db(self, ticker):
-        """ return single stock by ticker from the model db """
-        try:
-            stock = self.model.get_stock_and_history_by_ticker_db(ticker)
-            if stock:
-                return stock
-            else:
-                self.view.show_message("Stock not found")
-        except Exception as e:
-            self.view.show_message(f"Error fetching stock: {str(e)}")
+    # def load_stock_and_history_by_ticker_db(self, ticker):
+    #     """ return single stock by ticker from the model db """
+    #     try:
+    #         stock = self.model.get_stock_and_history_by_ticker_db(ticker)
+    #         if stock:
+    #             return stock
+    #         else:
+    #             self.view.show_message("Stock not found")
+    #     except Exception as e:
+    #         self.view.show_message(f"Error fetching stock: {str(e)}")
 
     def load_stock_by_ticker_tiingo(self, ticker):
         """ return stock by ticker from the tiingo api """
@@ -153,15 +153,15 @@ class presenter:
             self.view.show_message(f"Error fetching stock description: {str(e)}")
 
     def update_stock(self, stock_id, data):
-            try:
-                result = self.model.update_stock_by_id(stock_id, data)
-                if result:
-                    self.view.show_message("Stock updated successfully")
-                    self.load_stock_and_history_by_id_db(stock_id)  # Refresh the displayed stock
-                else:
-                    self.view.show_message("Failed to update stock")
-            except Exception as e:
-                self.view.show_message(f"Error updating stock: {str(e)}")
+        try:
+            result = self.model.update_stock_by_id(stock_id, data)
+            if result:
+                self.view.show_message("Stock updated successfully")
+                self.load_stock_and_history_by_id_db(stock_id)  # Refresh the displayed stock
+            else:
+                self.view.show_message("Failed to update stock")
+        except Exception as e:
+            self.view.show_message(f"Error updating stock: {str(e)}")
 
     def delete_stock_by_id(self, stock_id):
         try:
@@ -188,10 +188,14 @@ class presenter:
     def post_ticker_data(self, ticker, days=30):
         """add stock the db from tiingo api"""
         try:
-            result = self.model.post_stock_ticker_data(ticker, days)
-            if result:
-                self.view.show_message("Ticker data posted successfully")
-            else:
-                self.view.show_message("Failed to post ticker data")
+            res = self.model.get_stock_by_ticker_val_db(ticker)
+            if (res == None):
+                result = self.model.post_stock_ticker_data(ticker, days)
+                if result:
+                    self.view.show_message("Ticker data posted successfully")
+                    return True
+                else:
+                    self.view.show_message("Failed to post ticker data")
         except Exception as e:
             self.view.show_message(f"Error posting ticker data: {str(e)}")
+        return None

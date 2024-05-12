@@ -13,7 +13,8 @@ class Stock:
     def __init__(self, base_url="http://localhost:5210/api/Stock"):
         self.base_url = base_url
         self.Stock_list = []
-#############functions of stock list ############################
+
+    #############functions of stock list ############################
     def load_stock_to_list(self, ticker):
         self.Stock_list.append(ticker)
         if self.Stock_list[-1]:
@@ -189,7 +190,7 @@ class Stock:
                 json_obj = json.loads(json_str)
                 return [StockModel(**obj) for obj in json_obj]
             elif response.status_code == 404:
-               pass # return self.post_stock_ticker_data(query, 30)
+                pass  # return self.post_stock_ticker_data(query, 30)
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred retrieving stock graph: {e}")
         except requests.exceptions.RequestException as e:
@@ -215,9 +216,11 @@ class Stock:
             url = f"{self.base_url}/tiingoPost/{ticker}/db/{days}"
             response = requests.post(url)
             response.raise_for_status()
-            json_str = response.text
-            json_obj = json.loads(json_str)
-            return StockModel(**json_obj)
+            if (response.status_code == 200):
+                print(f"post success")
+                return True
+            elif (response.status_code == 404):
+                print(f"stock not found")
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error occurred post_stock_ticker_data: {e}")
         except requests.exceptions.RequestException as e:
