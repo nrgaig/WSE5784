@@ -1,7 +1,8 @@
 from PySide6 import QtGui
-from PySide6.QtGui import QAction
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QAction, Qt
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
-    QMessageBox, QMenuBar, QMenu, QPushButton, QListWidgetItem
+    QMessageBox, QMenuBar, QMenu, QPushButton, QListWidgetItem, QLabel
 import matplotlib
 
 matplotlib.use("Qt5Agg")
@@ -121,6 +122,28 @@ class View(QMainWindow):
         font = QtGui.QFont("Arial", 10, QtGui.QFont.Bold)
         self.Stock_list_view.setFont(font)
 
+        # Clock setup
+        self.clock_label = QLabel("00:00:00", self)
+        self.clock_label.setAlignment(Qt.AlignCenter)
+        font = self.clock_label.font()
+        font.setPointSize(16)  # Increase font size for better visibility
+        self.clock_label.setFont(font)
+
+        # Timer to update the clock every second
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_clock)
+        self.timer.start(1000)  # Update every 1000 milliseconds (1 second)
+
+        # Adjusting the layout to include the clock
+        self.right_layout.insertWidget(0, self.clock_label)  # Add the clock at the top of the right layout
+
+        # Rest of your existing setup code...
+
+    def update_clock(self):
+        # Update the label with the current time
+        current_time = datetime.now().strftime("%H:%M:%S")
+        self.clock_label.setText(current_time)
+
     #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
         # Method to handle search functionality
@@ -174,12 +197,11 @@ class View(QMainWindow):
     def set_protifolio_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
-        # self.plot_canvas.
+        self.plot_canvas.pyplot.clf()
 
-        # self.plot_canvas.plot_data(data, 'w')
         list = self.presenter.get_list()
         for stock in list:
-            s = self.presenter.load_stock_by_query_db(stock)
+            s = self.presenter.load_stock_details_by_ticker_db(stock)
             item = QListWidgetItem(f"{s.Ticker}\n"
                                    f"{s.Name}\n" f"{s.Value}\n")
             self.Stock_list_view.addItem(item)
