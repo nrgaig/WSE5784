@@ -199,3 +199,14 @@ class presenter:
         except Exception as e:
             self.view.show_message(f"Error posting ticker data: {str(e)}")
         return None
+
+    def load_stock_details_by_ticker_db (self, ticker):
+        """ return stock details by ticker from the model db """
+        try:
+            stock = self.model.get_stock_details_by_ticker_db(ticker)
+            if stock:
+                return stock
+            else:
+                self.view.show_message("Stock not found")
+        except Exception as e:
+            self.view.show_message(f"Error fetching stock: get_stock_by_query_val {str(e)}")

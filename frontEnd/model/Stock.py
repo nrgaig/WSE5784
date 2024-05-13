@@ -226,3 +226,17 @@ class Stock:
         except requests.exceptions.RequestException as e:
             print(f"Error posting stock ticker data: {e}")
         return None
+    
+    def get_stock_details_by_ticker_db(self,ticker):
+        """:return a single stock details by its ticker."""
+        try:
+            response = requests.get(f"{self.base_url}/stocks/{ticker}") #todo make it corract
+            response.raise_for_status()
+            json_str = response.text
+            json_obj = json.loads(json_str)
+            return StockModel(**json_obj)
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred get_stock_by_query_val: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error getting stocks get_stock_by_query_val: {e}")
+        return None
