@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from PySide6 import QtGui
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QAction, Qt
@@ -24,6 +26,11 @@ class PlotCanvas(FigureCanvas):
         self.axes.set_xlabel('Days')
         self.axes.set_ylabel('Price')
         self.draw()
+
+    def clear_plot(self):
+        """Clears the plot canvas."""
+        self.axes.clear()  # Clear the axes
+        self.draw()  # Redraw the canvas to show the cleared state
 
 
 class View(QMainWindow):
@@ -197,7 +204,7 @@ class View(QMainWindow):
     def set_protifolio_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
-        self.plot_canvas.pyplot.clf()
+        self.plot_canvas.clear_plot()  # Clear the plot canvas
 
         list = self.presenter.get_list()
         for stock in list:
@@ -216,6 +223,8 @@ class View(QMainWindow):
     def set_main_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
+        self.plot_canvas.clear_plot()  # Clear the plot canvas
+
 
         self.buy_button.setEnabled(True)
         self.delete_button.setEnabled(False)

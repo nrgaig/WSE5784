@@ -13,7 +13,7 @@ class tiingoPriceDtos:
 
 
 class StockModel:
-    def __init__(self, id: int, name: str, ticker: str, description: str, value: float, tiingoPriceDtos=None):
+    def __init__(self, id=None, name="", ticker="", description="", value=0.0, tiingoPriceDtos=None):
         self.Id = id
         self.Name = name
         self.Ticker = ticker
