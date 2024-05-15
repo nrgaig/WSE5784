@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, time, timedelta
+import pytz
 
-from PySide6 import QtGui
+import pytz
+from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QAction, Qt
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QListWidget, QLineEdit, \
@@ -31,6 +33,12 @@ class PlotCanvas(FigureCanvas):
         """Clears the plot canvas."""
         self.axes.clear()  # Clear the axes
         self.draw()  # Redraw the canvas to show the cleared state
+
+
+
+MARKET_OPEN = time(9, 30)
+MARKET_CLOSE = time(16, 0)
+NY_TZ = pytz.timezone('America/New_York')
 
 
 class View(QMainWindow):
@@ -111,16 +119,17 @@ class View(QMainWindow):
         self.main_layout.addLayout(self.right_layout, 1)  # Half width
         self.Stock_list_view.setWordWrap(True)
 
-        # Styling to increase readability and manage item height dynamically
-        self.Stock_list_view.setStyleSheet("""
-               QListWidget {
-                   background-color: #F0F0F0;
-                   color: #333;
-               }
-               QListWidget::item {
-                   margin: 4px;
-               }
-           """)
+        # # Styling to increase readability and manage item height dynamically
+        # self.Stock_list_view.setStyleSheet("""
+        #        QListWidget {
+        #            background-color: #F0F0F0;
+        #            color: #333;
+        #        }
+        #        QListWidget::item {
+        #            margin: 4px;
+        #        }
+        #    """)
+
 
         # Set window properties
         self.setWindowTitle("List View Application")
@@ -128,6 +137,23 @@ class View(QMainWindow):
 
         font = QtGui.QFont("Arial", 10, QtGui.QFont.Bold)
         self.Stock_list_view.setFont(font)
+
+        self.market_status_label = QLabel("Market Closed", self)
+        self.market_status_label.setAlignment(Qt.AlignCenter)
+        font = self.market_status_label.font()
+        font.setPointSize(12)
+        self.market_status_label.setFont(font)
+        self.right_layout.insertWidget(1, self.market_status_label)  # Add below the clock
+
+        # Add a button to delete all stocks from the portfolio
+        self.delete_all_button = QPushButton("Delete All Stocks")
+        self.delete_all_button.setEnabled(False)
+        self.delete_all_button.clicked.connect(self.delete_all_stocks)
+        self.right_layout.addWidget(self.delete_all_button)
+
+        # Additional code for daily change indicator next to the graph
+        self.daily_change_label = QLabel("Daily Change: +0.00 (0.00%)", self)
+        self.right_layout.insertWidget(3, self.daily_change_label)
 
         # Clock setup
         self.clock_label = QLabel("00:00:00", self)
@@ -144,12 +170,88 @@ class View(QMainWindow):
         # Adjusting the layout to include the clock
         self.right_layout.insertWidget(0, self.clock_label)  # Add the clock at the top of the right layout
 
+        self.setStyleSheet("""
+                QMainWindow {
+                    background-color: #343a40;  /* Dark gray background */
+                    color: #f8f9fa;            /* Light text color */
+                }
+                QPushButton {
+                    background-color: #007bff; /* Bootstrap blue */
+                    color: white;
+                    border-radius: 5px;
+                    padding: 6px;
+                    font-size: 16px;
+                }
+                QPushButton:hover {
+                    background-color: #0056b3; /* Darker blue on hover */
+                }
+                QLabel {
+                    font-size: 14px;
+                }
+                QListWidget {
+                    background-color: #495057; /* Darker gray for lists */
+                    color: #f8f9fa;
+                    border: none;
+                    border-radius: 5px;
+                }
+                QLineEdit {
+                    border-radius: 5px;
+                    padding: 6px;
+                    background-color: #ced4da; /* Light gray background */
+                    color: #343a40;            /* Dark text for contrast */
+                }
+            """)
+
+        # Enhance font across the application
+        font = QtGui.QFont("Helvetica", 10)
+        self.setFont(font)
+
+        # Styling and positioning the clock and market status labels
+        self.clock_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        self.market_status_label.setStyleSheet("font-size: 18px; padding: 8px;")
+
+        # Adjust layout spacings and padding
+        self.main_layout.setSpacing(20)  # Increase spacing between left and right layouts
+        self.left_layout.setSpacing(10)
+        self.right_layout.setSpacing(10)
+
+        # Adding shadows to widgets for a more layered look
+        shadow = QtWidgets.QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(15)
+        shadow.setColor(QtGui.QColor('black'))
+        shadow.setOffset(2)
+        self.Stock_list_view.setGraphicsEffect(shadow)
+        self.StockExtendedDisplay.setGraphicsEffect(shadow)
+        self.plot_canvas.setGraphicsEffect(shadow)
+
+        # Adjust margins for cleaner layout borders
+        self.left_layout.setContentsMargins(10, 10, 10, 10)
+        self.right_layout.setContentsMargins(10, 10, 10, 10)
+
+        # Update layout after styling changes
+        self.central_widget.setLayout(self.main_layout)
+
         # Rest of your existing setup code...
 
     def update_clock(self):
-        # Update the label with the current time
-        current_time = datetime.now().strftime("%H:%M:%S")
-        self.clock_label.setText(current_time)
+        now = datetime.now(NY_TZ)
+        self.clock_label.setText(now.strftime("%H:%M:%S"))
+        self.update_market_status(now)
+
+    def delete_all_stocks(self):
+        self.presenter.delete_all_stocks()
+        self.set_protifolio_window()
+
+    def update_market_status(self, now):
+        # Determine if the market is open or closed
+        if now.date().weekday() < 5 and MARKET_OPEN <= now.time() <= MARKET_CLOSE:
+            self.market_status_label.setText("שוק המניות פתוח")
+            self.market_status_label.setStyleSheet("color: green;")  # Set label color to green
+            self.clock_label.setStyleSheet("color: green;")  # Set clock color to green
+        else:
+            self.market_status_label.setText("שוק המניות סגור")
+            self.market_status_label.setStyleSheet("color: red;")
+            self.clock_label.setStyleSheet("color: red;")  # Set clock color to red
 
     #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
@@ -183,6 +285,10 @@ class View(QMainWindow):
         QMessageBox.information(self, "Message", message)
 
     def on_item_clicked(self, item):
+        # Extract the ticker from the selected item
+        tickerItem = item.text().split('\n')[0]
+        self.presenter.current_stock = tickerItem
+
         self.StockExtendedDisplay.clear()
 
         tickerItem = item.text().split('\n')[0]
@@ -201,6 +307,17 @@ class View(QMainWindow):
             else:
                 self.plot_canvas.plot_data([d.Close for d in tiingoPricesList])
 
+        self.presenter.fetch_daily_stock_prices(tickerItem)
+
+
+    def update_daily_change(self, open_price, close_price):
+        change = close_price - open_price
+        percent_change = (change / open_price) * 100 if open_price != 0 else 0
+        arrow = "↑" if change >= 0 else "↓"
+        color = "green" if change >= 0 else "red"
+        self.daily_change_label.setText(f"Daily Change: {arrow}{change:.2f} ({percent_change:.2%})")
+        self.daily_change_label.setStyleSheet(f"color: {color}")
+
     def set_protifolio_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
@@ -214,6 +331,7 @@ class View(QMainWindow):
             self.Stock_list_view.addItem(item)
 
         self.buy_button.setEnabled(False)
+        self.delete_all_button.setEnabled(True)
         self.delete_button.setEnabled(True)
 
     def delete_stock(self):
@@ -228,6 +346,7 @@ class View(QMainWindow):
 
         self.buy_button.setEnabled(True)
         self.delete_button.setEnabled(False)
+        self.delete_all_button.setEnabled(False)
         self.load_all_stocks(self.presenter.get_all_stocks_db())
 
     def buy_stock(self, stock):

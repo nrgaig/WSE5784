@@ -210,3 +210,20 @@ class presenter:
                 self.view.show_message("Stock not found")
         except Exception as e:
             self.view.show_message(f"Error fetching stock: get_stock_by_query_val {str(e)}")
+
+    def delete_all_stocks(self):
+        try:
+            self.model.delete_all_stocks()  # Assuming your model has a method to delete all stocks
+            self.view.show_message("All stocks have been deleted successfully")
+        except Exception as e:
+            self.view.show_message(f"Error deleting all stocks: {str(e)}")
+
+    def fetch_daily_stock_prices(self, ticker):
+        stock_data = self.load_stock_by_ticker_from_tiingo(ticker)
+        if stock_data:
+            open_price = stock_data[0].Open  # Assuming the first element has the opening price
+            close_price = stock_data[-1].Close  # Assuming the last element has the closing price
+            self.view.update_daily_change(open_price, close_price)
+        else:
+            self.view.show_message("No data available for the selected stock")
+

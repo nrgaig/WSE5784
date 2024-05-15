@@ -241,3 +241,9 @@ class Stock:
         except requests.exceptions.RequestException as e:
             print(f"Error getting stocks get_stock_by_query_val: {e}")
         return None
+
+    def delete_all_stocks (self):
+        try:
+            self.Stock_list.clear()
+        except Exception as e:
+            print(f"Error deleting all stocks: {str(e)}")
