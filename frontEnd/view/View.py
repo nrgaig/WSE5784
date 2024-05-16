@@ -323,11 +323,11 @@ class View(QMainWindow):
         self.StockExtendedDisplay.clear()
         self.plot_canvas.clear_plot()  # Clear the plot canvas
 
-        list = self.presenter.get_list()
-        for stock in list:
-            s = self.presenter.load_stock_details_by_ticker_db(stock)
+        stock_list = self.presenter.get_list()
+        for stock in stock_list:
+            s = self.presenter.load_stock_details_by_ticker_db(stock[0])
             item = QListWidgetItem(f"{s.Ticker}\n"
-                                   f"{s.Name}\n" f"{s.Value}\n")
+                                   f"{s.Name}\n" f"{s.Value *stock[1]}\n")
             self.Stock_list_view.addItem(item)
 
         self.buy_button.setEnabled(False)

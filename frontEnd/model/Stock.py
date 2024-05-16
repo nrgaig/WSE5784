@@ -16,16 +16,24 @@ class Stock:
 
     #############functions of stock list ############################
     def load_stock_to_list(self, ticker):
-        self.Stock_list.append(ticker)
+        for stock in self.Stock_list:
+            if stock[0] == ticker:
+                stock[1]+= 1
+                return True
+        self.Stock_list.append([ticker, 1])
         if self.Stock_list[-1]:
             return True
         return False
 
     def delete_stock_by_symbol_from_list(self, symbol):
         for stock in self.Stock_list:
-            if stock == symbol:
-                self.Stock_list.remove(stock)
-                return True
+            if stock[0] == symbol:
+                if stock[1] > 1:
+                    stock[1] -= 1
+                    return True
+                else:
+                    self.Stock_list.remove(stock)
+                    return True
         return False
 
     def get_list(self):
