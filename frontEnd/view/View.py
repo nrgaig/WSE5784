@@ -312,7 +312,7 @@ class View(QMainWindow):
 
     def update_daily_change(self, open_price, close_price):
         change = close_price - open_price
-        percent_change = (change / open_price) * 100 if open_price != 0 else 0
+        percent_change = (change / open_price) if open_price != 0 else 0
         arrow = "↑" if change >= 0 else "↓"
         color = "green" if change >= 0 else "red"
         self.daily_change_label.setText(f"Daily Change: {arrow}{change:.2f} ({percent_change:.2%})")
