@@ -152,7 +152,7 @@ class View(QMainWindow):
         self.right_layout.addWidget(self.delete_all_button)
 
         # Additional code for daily change indicator next to the graph
-        self.daily_change_label = QLabel("Daily Change: +0.00 (0.00%)", self)
+        self.daily_change_label = QLabel("monthly Change: +0.00 (0.00%)", self)
         self.right_layout.insertWidget(3, self.daily_change_label)
 
         # Clock setup
@@ -231,7 +231,20 @@ class View(QMainWindow):
         # Update layout after styling changes
         self.central_widget.setLayout(self.main_layout)
 
-        # Rest of your existing setup code...
+        self.total_share_value_label = QLabel("Total Share Value: $0.00", self)
+        self.total_share_value_label.setAlignment(Qt.AlignCenter)
+        font = self.total_share_value_label.font()
+        font.setPointSize(14)
+        self.total_share_value_label.setFont(font)
+        self.left_layout.insertWidget(2, self.total_share_value_label)  # Add below the market status label
+        self.total_share_value_label.setStyleSheet("color: green;")  # Set label color to green
+        self.total_share_value_label.setVisible(False)
+
+    def calculate_total_share_value(self):
+        stock_list = self.presenter.get_list()
+        total_value = sum(
+            stock[1] * self.presenter.load_stock_details_by_ticker_db(stock[0]).Value for stock in stock_list)
+        self.total_share_value_label.setText(f"Total Share Value: ${total_value:.2f}")
 
     def update_clock(self):
         now = datetime.now(NY_TZ)
@@ -241,6 +254,8 @@ class View(QMainWindow):
     def delete_all_stocks(self):
         self.presenter.delete_all_stocks()
         self.set_protifolio_window()
+        self.calculate_total_share_value()
+
 
     def update_market_status(self, now):
         # Determine if the market is open or closed
@@ -322,6 +337,7 @@ class View(QMainWindow):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
         self.plot_canvas.clear_plot()  # Clear the plot canvas
+        self.total_share_value_label.setVisible(True)
 
         stock_list = self.presenter.get_list()
         for stock in stock_list:
@@ -334,14 +350,20 @@ class View(QMainWindow):
         self.delete_all_button.setEnabled(True)
         self.delete_button.setEnabled(True)
 
+        self.calculate_total_share_value()
+
+
     def delete_stock(self):
         self.presenter.delete_stock_by_symbol(self.presenter.current_stock)
         self.set_protifolio_window()
+        self.calculate_total_share_value()
+
 
     def set_main_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
         self.plot_canvas.clear_plot()  # Clear the plot canvas
+        self.total_share_value_label.setVisible(False)
 
 
         self.buy_button.setEnabled(True)
