@@ -35,7 +35,6 @@ class PlotCanvas(FigureCanvas):
         self.draw()  # Redraw the canvas to show the cleared state
 
 
-
 MARKET_OPEN = time(9, 30)
 MARKET_CLOSE = time(16, 0)
 NY_TZ = pytz.timezone('America/New_York')
@@ -47,6 +46,7 @@ class View(QMainWindow):
         super().__init__()
         self.query = None
         self.presenter = None
+        self.is_portfolio_view = False
 
     def set_presenter(self, presenter):
         self.presenter = presenter
@@ -129,7 +129,6 @@ class View(QMainWindow):
         #            margin: 4px;
         #        }
         #    """)
-
 
         # Set window properties
         self.setWindowTitle("List View Application")
@@ -256,7 +255,6 @@ class View(QMainWindow):
         self.set_protifolio_window()
         self.calculate_total_share_value()
 
-
     def update_market_status(self, now):
         # Determine if the market is open or closed
         if now.date().weekday() < 5 and MARKET_OPEN <= now.time() <= MARKET_CLOSE:
@@ -270,13 +268,29 @@ class View(QMainWindow):
 
     #   self.Stock_list_view.setStyleSheet("background-color: #F0F0F0; color: #333;")
     def on_search(self, query):
-        # Method to handle search functionality
         self.query = query
         self.Stock_list_view.clear()
-        if query == "":
-            filtered_stocks = self.presenter.get_all_stocks_db()
+
+        if self.is_portfolio_view:
+            # Search only in bought stocks
+            bought_stocks = self.presenter.get_list()
+            if query == "":
+                filtered_stocks = [self.presenter.load_stock_details_by_ticker_db(stock[0]) for stock in bought_stocks]
+            else:
+                filtered_stocks = [
+                    self.presenter.load_stock_details_by_ticker_db(stock[0])
+                    for stock in bought_stocks
+                    if query.lower() in stock[
+                        0].lower() or query.lower() in self.presenter.load_stock_details_by_ticker_db(
+                        stock[0]).Name.lower()
+                ]
         else:
-            filtered_stocks = self.presenter.load_stock_by_query_db(query)  # or []
+            # Search in all stocks
+            if query == "":
+                filtered_stocks = self.presenter.get_all_stocks_db()
+            else:
+                filtered_stocks = self.presenter.load_stock_by_query_db(query)  # or []
+
         if filtered_stocks:
             for stock in filtered_stocks:
                 if stock:
@@ -284,8 +298,25 @@ class View(QMainWindow):
                                            f"{stock.Name}\n" f"{stock.Value}\n")
                     self.Stock_list_view.addItem(item)
         else:
-            # self.Stock_list_view.clear()
             self.Stock_list_view.addItem("No results found")
+
+    # def on_search(self, query):
+    #     # Method to handle search functionality
+    #     self.query = query
+    #     self.Stock_list_view.clear()
+    #     if query == "":
+    #         filtered_stocks = self.presenter.get_all_stocks_db()
+    #     else:
+    #         filtered_stocks = self.presenter.load_stock_by_query_db(query)  # or []
+    #     if filtered_stocks:
+    #         for stock in filtered_stocks:
+    #             if stock:
+    #                 item = QListWidgetItem(f"{stock.Ticker}\n"
+    #                                        f"{stock.Name}\n" f"{stock.Value}\n")
+    #                 self.Stock_list_view.addItem(item)
+    #     else:
+    #         # self.Stock_list_view.clear()
+    #         self.Stock_list_view.addItem("No results found")
 
     def load_all_stocks(self, stocks):
         self.Stock_list_view.clear()
@@ -324,7 +355,6 @@ class View(QMainWindow):
 
         self.presenter.fetch_daily_stock_prices(tickerItem)
 
-
     def update_daily_change(self, open_price, close_price):
         change = close_price - open_price
         percent_change = (change / open_price) if open_price != 0 else 0
@@ -338,12 +368,13 @@ class View(QMainWindow):
         self.StockExtendedDisplay.clear()
         self.plot_canvas.clear_plot()  # Clear the plot canvas
         self.total_share_value_label.setVisible(True)
+        self.is_portfolio_view = True
 
         stock_list = self.presenter.get_list()
         for stock in stock_list:
             s = self.presenter.load_stock_details_by_ticker_db(stock[0])
             item = QListWidgetItem(f"{s.Ticker}\n"
-                                   f"{s.Name}\n" f"{s.Value *stock[1]}\n")
+                                   f"{s.Name}\n" f"{s.Value * stock[1]}\n")
             self.Stock_list_view.addItem(item)
 
         self.buy_button.setEnabled(False)
@@ -352,19 +383,17 @@ class View(QMainWindow):
 
         self.calculate_total_share_value()
 
-
     def delete_stock(self):
         self.presenter.delete_stock_by_symbol(self.presenter.current_stock)
         self.set_protifolio_window()
         self.calculate_total_share_value()
-
 
     def set_main_window(self):
         self.Stock_list_view.clear()
         self.StockExtendedDisplay.clear()
         self.plot_canvas.clear_plot()  # Clear the plot canvas
         self.total_share_value_label.setVisible(False)
-
+        self.is_portfolio_view = False
 
         self.buy_button.setEnabled(True)
         self.delete_button.setEnabled(False)
