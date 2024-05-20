@@ -60,7 +60,7 @@ class View(QMainWindow):
         self.Stock_list_view.itemClicked.connect(self.on_item_clicked)
 
         # buttons
-        self.delete_button = QPushButton("Delete")
+        self.delete_button = QPushButton("Sell")
         self.delete_button.setEnabled(False)
         self.delete_button.clicked.connect(self.delete_stock)
         self.buy_button = QPushButton("Buy")
@@ -146,7 +146,7 @@ class View(QMainWindow):
         self.right_layout.insertWidget(1, self.market_status_label)  # Add below the clock
 
         # Add a button to delete all stocks from the portfolio
-        self.delete_all_button = QPushButton("Delete All Stocks")
+        self.delete_all_button = QPushButton("Sell All Stocks")
         self.delete_all_button.setEnabled(False)
         self.delete_all_button.clicked.connect(self.delete_all_stocks)
         self.right_layout.addWidget(self.delete_all_button)
@@ -330,7 +330,7 @@ class View(QMainWindow):
         percent_change = (change / open_price) if open_price != 0 else 0
         arrow = "↑" if change >= 0 else "↓"
         color = "green" if change >= 0 else "red"
-        self.daily_change_label.setText(f"Daily Change: {arrow}{change:.2f} ({percent_change:.2%})")
+        self.daily_change_label.setText(f"Monthly Change: {arrow}{change:.2f} ({percent_change:.2%})")
         self.daily_change_label.setStyleSheet(f"color: {color}")
 
     def set_protifolio_window(self):
